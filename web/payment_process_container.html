@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Parameter Validation with Message Handling</title>
+    <style>
+        /* Set body and html to full height and no margin */
+        html, body {
+            height: 100%;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+        /* Style for the invalid message */
+        .invalid-message {
+            font-size: 24px;
+            color: red;
+        }
+        /* Set the iframe to take up full width and height of the body */
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none; /* Optional: removes the border around the iframe */
+            display: none; /* Initially hidden */
+        }
+    </style>
+    <script>
+        // Function to listen to messages from the iframe
+        function receiveMessage(event) {
+            // Check if the received message has a property 'type'
+            if (event.data) {
+                // Post the message to the parent window
+                window.parent.postMessage(event.data, "*");
+            }
+        }
+
+        // Function to get URL parameters
+        function getParameterByName(name, url = window.location.href) {
+            name = name.replace(/[\[\]]/g, '\\$&');
+            var regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'),
+                results = regex.exec(url);
+            if (!results) return null;
+            if (!results[2]) return '';
+            return decodeURIComponent(results[2].replace(/\+/g, ' '));
+        }
+
+        // Function to check if all required params are present
+        function allParamsPresent() {
+            const requiredParams = ['amount', 'email', 'zip', 'address'];
+            return requiredParams.every(param => getParameterByName(param) !== null);
+        }
+
+        // Function to set the content based on parameter validation
+        function setContent() {
+            if (allParamsPresent()) {
+                // Set iframe source and display it
+                const iframe = document.querySelector('iframe');
+                iframe.src = buildIframeSrc();
+                iframe.style.display = 'block';
+            } else {
+                // Display invalid message
+                document.body.innerHTML = '<div class="invalid-message">Invalid params</div>';
+            }
+        }
+
+        // Function to build the iframe URL with parameters
+        function buildIframeSrc() {
+            const baseUrl = "https://ttorbik.github.io/agrok/payment_process.html"; // Replace with your URL
+            const params = {
+                amount: getParameterByName('amount'),
+                email: getParameterByName('email'),
+                zip: getParameterByName('zip'),
+                address: getParameterByName('address')
+            };
+            const queryString = Object.keys(params).map(key => encodeURIComponent(key) + '=' + encodeURIComponent(params[key])).join('&');
+            return baseUrl + '?' + queryString;
+        }
+
+        // Set up the event listener for receiving messages
+        window.addEventListener("message", receiveMessage, false);
+
+        window.onload = setContent;
+    </script>
+</head>
+<body>
+<!-- The iframe embedding another website -->
+<iframe></iframe>
+</body>
+</html>

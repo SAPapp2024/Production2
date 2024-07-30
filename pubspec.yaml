@@ -1,0 +1,235 @@
+name: agro_k
+description: A new Flutter project.
+
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: ">=3.0.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_web_plugins:
+    sdk: flutter
+  cupertino_icons: ^1.0.5
+  firebase_core: ^2.27.0
+  cloud_firestore: ^4.15.6
+  firebase_auth: ^4.17.8
+  firebase_messaging: ^14.7.19
+  uuid: ^3.0.6
+  json_annotation: ^4.7.0
+  image_picker: ^0.8.6
+  firebase_storage: ^11.6.9
+  google_maps_flutter: ^2.3.1
+  google_maps_flutter_web: ^0.5.1
+  flutter_google_places: ^0.3.0
+  location: ^5.0.3
+  flutter_typeahead: ^4.6.2
+  pdf: ^3.10.4
+  share_plus: ^7.2.1
+  barcode_widget: ^2.0.4
+  drift: ^2.11.1
+  sqlite3_flutter_libs: ^0.5.17
+  path_provider: ^2.1.1
+  path: ^1.8.3
+  intl_phone_field:
+    git:
+      url: https://github.com/deloss/intl_phone_field
+      ref: master
+  excel: ^2.1.0
+  file_picker: ^5.2.5
+  universal_html: ^2.0.8
+  collection: ^1.16.0
+  awesome_notifications: ^0.8.2
+  shared_preferences: ^2.0.17
+  intl: ^0.18.1
+  fl_chart: ^0.62.0
+  dropdown_button2: ^2.0.0
+  injectable: ^2.1.0
+  get_it: ^7.2.0
+  http: ^0.13.5
+  equatable: ^2.0.5
+  go_router: ^10.0.0
+  rxdart: ^0.26.0
+  uni_links: ^0.5.1
+  typesense: ^0.3.1
+  package_info_plus: ^4.0.0
+  firebase_crashlytics: ^3.4.18
+  cloud_functions: ^4.6.6
+  flutter_bloc: ^8.1.3
+  url_launcher: ^6.1.11
+  printing: ^5.11.0
+  formz: ^0.6.0
+  device_info_plus: ^9.1.0
+  webview_flutter: ^4.4.2
+  xml: ^6.5.0
+  encrypt: ^5.0.3
+  flutter_pdfview: ^1.3.2
+  pdf_render: ^1.4.10
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^2.0.1
+  drift_dev: ^2.11.2
+  build_runner: ^2.4.6
+  json_serializable: ^6.4.1
+  flutter_launcher_icons: ^0.13.0
+  injectable_generator: ^2.1.3
+  flutter_keyboard_visibility: ^5.4.1
+
+dependency_overrides:
+  google_api_headers: ^2.0.0
+
+flutter_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "images/appIcon.png"
+  min_sdk_android: 21
+  remove_alpha_ios: true
+  web:
+    generate: true
+    image_path: "images/appIcon.png"
+    background_color: "#FFFFFF"
+    theme_color: "#FFFFFF"
+
+flutter:
+  uses-material-design: true
+  assets:
+    - images/
+  fonts:
+    - family: Poppins
+      fonts:
+        - asset: fonts/Poppins-Black.ttf
+          weight: 900
+        - asset: fonts/Poppins-BlackItalic.ttf
+          style: italic
+          weight: 900
+        - asset: fonts/Poppins-Bold.ttf
+          weight: 700
+        - asset: fonts/Poppins-BoldItalic.ttf
+          style: italic
+          weight: 700
+        - asset: fonts/Poppins-ExtraBold.ttf
+          weight: 800
+        - asset: fonts/Poppins-ExtraBoldItalic.ttf
+          style: italic
+          weight: 800
+        - asset: fonts/Poppins-ExtraLight.ttf
+          weight: 300
+        - asset: fonts/Poppins-ExtraLightItalic.ttf
+          style: italic
+          weight: 300
+        - asset: fonts/Poppins-Italic.ttf
+          style: italic
+        - asset: fonts/Poppins-Light.ttf
+          weight: 400
+        - asset: fonts/Poppins-LightItalic.ttf
+          style: italic
+          weight: 400
+        - asset: fonts/Poppins-Medium.ttf
+          weight: 500
+        - asset: fonts/Poppins-MediumItalic.ttf
+          style: italic
+          weight: 500
+        - asset: fonts/Poppins-Regular.ttf
+        - asset: fonts/Poppins-SemiBold.ttf
+        - asset: fonts/Poppins-SemiBoldItalic.ttf
+          style: italic
+        - asset: fonts/Poppins-Thin.ttf
+        - asset: fonts/Poppins-ThinItalic.ttf
+          style: italic
+    - family: Raleway
+      fonts:
+        - asset: fonts/Raleway-Black.ttf
+          weight: 900
+        - asset: fonts/Raleway-BlackItalic.ttf
+          style: italic
+          weight: 900
+        - asset: fonts/Raleway-Bold.ttf
+          weight: 700
+        - asset: fonts/Raleway-BoldItalic.ttf
+          style: italic
+          weight: 700
+        - asset: fonts/Raleway-ExtraBold.ttf
+          weight: 800
+        - asset: fonts/Raleway-ExtraBoldItalic.ttf
+          style: italic
+          weight: 800
+        - asset: fonts/Raleway-ExtraLight.ttf
+          weight: 300
+        - asset: fonts/Raleway-ExtraLightItalic.ttf
+          style: italic
+          weight: 300
+        - asset: fonts/Raleway-Italic.ttf
+          style: italic
+        - asset: fonts/Raleway-Light.ttf
+          weight: 400
+        - asset: fonts/Raleway-LightItalic.ttf
+          style: italic
+          weight: 400
+        - asset: fonts/Raleway-Medium.ttf
+          weight: 500
+        - asset: fonts/Raleway-MediumItalic.ttf
+          style: italic
+          weight: 500
+        - asset: fonts/Raleway-Regular.ttf
+        - asset: fonts/Raleway-SemiBold.ttf
+        - asset: fonts/Raleway-SemiBoldItalic.ttf
+          style: italic
+        - asset: fonts/Raleway-Thin.ttf
+        - asset: fonts/Raleway-ThinItalic.ttf
+          style: italic
+    - family: Mulish
+      fonts:
+        - asset: fonts/Mulish-Black.ttf
+          weight: 900
+        - asset: fonts/Mulish-BlackItalic.ttf
+          style: italic
+          weight: 900
+        - asset: fonts/Mulish-Bold.ttf
+          weight: 700
+        - asset: fonts/Mulish-BoldItalic.ttf
+          style: italic
+          weight: 700
+        - asset: fonts/Mulish-ExtraBold.ttf
+          weight: 800
+        - asset: fonts/Mulish-ExtraBoldItalic.ttf
+          style: italic
+          weight: 800
+        - asset: fonts/Mulish-ExtraLight.ttf
+          weight: 300
+        - asset: fonts/Mulish-ExtraLightItalic.ttf
+          style: italic
+          weight: 300
+        - asset: fonts/Mulish-Italic.ttf
+          style: italic
+        - asset: fonts/Mulish-Light.ttf
+          weight: 400
+        - asset: fonts/Mulish-LightItalic.ttf
+          style: italic
+          weight: 400
+        - asset: fonts/Mulish-Medium.ttf
+          weight: 500
+        - asset: fonts/Mulish-MediumItalic.ttf
+          style: italic
+          weight: 500
+        - asset: fonts/Mulish-Regular.ttf
+        - asset: fonts/Mulish-SemiBold.ttf
+        - asset: fonts/Mulish-SemiBoldItalic.ttf
+          style: italic
+    - family: Arial
+      fonts:
+        - asset: fonts/Arial-Bold.ttf
+          weight: 700
+        - asset: fonts/Arial-Regular.ttf
+        - asset: fonts/Arial-Italic.ttf
+          style: italic
+    - family: Calibri
+      fonts:
+        - asset: fonts/Calibri-Bold.ttf
+          weight: 700
+        - asset: fonts/Calibri-Regular.ttf
+        - asset: fonts/Calibri-Italic.ttf
+          style: italic

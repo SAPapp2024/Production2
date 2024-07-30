@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <title>Agro-K Payment</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://demo.convergepay.com/hosted-payments/PayWithConverge.js"></script>
+    <script>
+        var transactionToken = ''; // Global variable for the transaction token
+
+        function getQueryParameters() {
+            var queryParams = {
+                amount: null,
+                zip: null,
+                address: null,
+                email: null
+            };
+
+            var queryString = window.location.search.substring(1);
+            var params = queryString.split('&');
+
+            for (var i = 0; i < params.length; i++) {
+                var pair = params[i].split('=');
+                var key = decodeURIComponent(pair[0]);
+                var value = decodeURIComponent(pair[1]);
+
+                if (key === 'amount' || key === 'zip' || key === 'address' || key === 'email') {
+                    queryParams[key] = value;
+                }
+            }
+
+            return queryParams;
+        }
+
+        function callBackend() {
+          var params = getQueryParameters();
+          if (params.amount === null || params.zip === null || params.address === null || params.email === null) {
+              showResult('Error', 'Missing query parameters');
+              return;
+          }
+          var url = 'https://us-central1-agro-k-dev.cloudfunctions.net/getConvergePayToken';
+          fetch(url, {
+              method: 'POST', // or 'GET', depending on your backend
+              body: JSON.stringify(params), // data can be `string` or {object}!
+              headers: {
+                   'Content-Type': 'application/json',
+              },
+          })
+          .then(response => response.text())
+          .then(data => {
+              console.log(data);
+              transactionToken = data;
+              openLightbox();
+              // Handle success here
+          })
+          .catch((error) => {
+              console.log(`Errorcito + ${error}`);
+              // Handle errors here
+          });
+      }
+
+        window.onload = function() {
+          callBackend();
+        };
+
+        function initiateLightbox() {
+            // Assume getToken is an async function that sets the transactionToken
+            getToken().then(function() {
+                // Once the token is set, open the lightbox
+                openLightbox();
+            }).catch(function(error) {
+                // Handle any errors here
+                console.error("Error getting token:", error);
+            });
+        }
+
+        function openLightbox() {
+            var paymentFields = {
+                ssl_txn_auth_token: transactionToken
+            };
+
+            var callback = {
+                onError: function (error) {
+                  console.log(`function is onError`)
+                  window.parent.postMessage(JSON.stringify({
+                    type: 'error',
+                    data: error
+                  }, null, '\t'), window.location.href);
+                },
+                onCancelled: function () {
+                  console.log(`function is onCancelled`)
+                  window.parent.postMessage(JSON.stringify({
+                    type: 'canceled',
+                  }, null, '\t'), window.location.href);
+                },
+                onDeclined: function (response) {
+                  console.log(`function is onDeclined`)
+                  window.parent.postMessage(JSON.stringify({
+                    type: 'declined',
+                    data: response
+                  }, null, '\t'), window.location.href);
+                },
+                onApproval: function (response) {
+                  console.log(`function is onApproval - ${window.location.href}`)
+                  window.parent.postMessage(JSON.stringify({
+                    type: 'approved',
+                    data: response
+                  }, null, '\t'), window.location.href);
+                }
+            };
+
+            PayWithConverge.open(paymentFields, callback);
+        }
+
+        function showResult(status, msg) {
+            document.getElementById('txn_status').innerHTML = "<b>" + status + "</b>";
+            document.getElementById('txn_response').innerHTML = msg;
+        }
+    </script>
+</head>
+
+<body>
+<div id="txn_status"></div>
+<div id="txn_response"></div>
+</body>
+</html>

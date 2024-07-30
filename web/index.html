@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <!--
+    If you are serving your web app in a path other than the root, change the
+    href value below to reflect the base path you are serving from.
+
+    The path provided below has to start and end with a slash "/" in order for
+    it to work correctly.
+
+    For more details:
+    * https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base
+
+    This is a placeholder for base href that will be replaced by the value of
+    the `--base-href` argument provided to `flutter build`.
+  -->
+  <base href="$FLUTTER_BASE_HREF">
+
+  <meta charset="UTF-8">
+  <meta content="IE=Edge" http-equiv="X-UA-Compatible">
+  <meta name="description" content="A new Flutter project.">
+
+  <!-- iOS meta tags & icons -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-title" content="agro_k">
+  <link rel="apple-touch-icon" href="icons/Icon-192.png">
+  <link rel="shortcut icon" type="image/png" href="images/appIconWeb.png" />
+
+  <script defer src="sql-wasm.js"></script>
+  <title>agro_k</title>
+  <link rel="manifest" href="manifest.json">
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCqvV43wWkjrzfDEV7hSzjRUJjOnGRsMWQ"></script>
+  <script>
+    // The value below is injected by flutter build, do not touch.
+    var serviceWorkerVersion = null;
+  </script>
+  <script src="flutter.js" defer></script>
+</head>
+<body>
+<!-- Loading indicator -->
+<div id="loading">
+  <style>
+      body {
+        inset: 0;
+        overflow: hidden;
+        margin: 0;
+        padding: 0;
+        position: fixed;
+      }
+
+      #loading {
+        align-items: center;
+        display: flex;
+        height: 100%;
+        justify-content: center;
+        width: 100%;
+      }
+
+      #loading img {
+        animation: 1s ease-in-out 0s infinite alternate breathe;
+        opacity: .66;
+        transition: opacity .4s;
+      }
+
+      #loading.main_done img {
+        opacity: 1;
+      }
+
+      @keyframes breathe {
+        from {
+          transform: scale(1)
+        }
+
+        to {
+          transform: scale(0.95)
+        }
+      }
+    </style>
+  <img src="icons/Icon-192.png" alt="Loading indicator..." />
+</div>
+<script>
+    const config = {
+      canvasKitBaseUrl: "./canvaskit/"
+    };
+    window.addEventListener('load', function () {
+      var loading = document.querySelector('#loading');
+      _flutter.loader.loadEntrypoint({
+        serviceWorker: {
+          serviceWorkerVersion: serviceWorkerVersion,
+        }
+      }).then(function (engineInitializer) {
+        loading.classList.add('main_done');
+        return engineInitializer.initializeEngine(config);
+      }).then(function (appRunner) {
+        return appRunner.runApp();
+      }).then(function (app) {
+        loading.remove();
+      });
+    });
+    // load serviceworker earlier
+    const serviceWorkerActivation = navigator.serviceWorker.register(
+      "flutter_service_worker.js?v=" + serviceWorkerVersion
+    );
+  </script>
+  <script>
+      const wait_until = setInterval(() => {
+        var elt = document.querySelector('flt-glass-pane');
+        if (elt) {
+          clearInterval(wait_until);
+          var sheet = new CSSStyleSheet;
+          sheet.replaceSync('flt-scene-host * p, flt-scene-host * canvas { image-rendering: pixelated; }');
+          elt.shadowRoot.adoptedStyleSheets = [sheet];
+        }
+      }, 500);
+  </script>
+</body>
+</html>

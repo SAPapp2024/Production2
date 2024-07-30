@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "176841698268",
+    "project_id": "agro-k-dev",
+    "storage_bucket": "agro-k-dev.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:176841698268:android:9d6a487583c1d0a7a67d19",
+        "android_client_info": {
+          "package_name": "com.agrok.SapAnalysis.dev"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "176841698268-ot084o25cb4jc2fhr69bdgvpm98oqgb6.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA0vICOH4wQR-WvBbg2kO37TUCZuBPT6_8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "176841698268-ot084o25cb4jc2fhr69bdgvpm98oqgb6.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "176841698268-ri6j37s5jhqcrm2bk62mfe3u7jmghjsk.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.agrok.plantAnalysisDev"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

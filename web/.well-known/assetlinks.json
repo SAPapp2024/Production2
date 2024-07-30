@@ -1,0 +1,10 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.agrok.SapAnalysis.dev",
+      "sha256_cert_fingerprints": ["6F:63:15:1C:A3:05:1F:0D:65:BB:61:67:51:58:99:95:6C:EF:F8:4A:52:30:44:5C:B4:C4:44:15:E3:10:91:B3"]
+    }
+  }
+]

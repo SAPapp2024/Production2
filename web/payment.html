@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <title>Lightbox Demo</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://demo.convergepay.com/hosted-payments/PayWithConverge.js"></script>
+    <script>
+        var transactionToken = ''; // Global variable for the transaction token
+
+        function callBackend() {
+          var url = 'https://us-central1-agro-k-dev.cloudfunctions.net/getConvergePayToken';
+          fetch(url, {
+              method: 'POST', // or 'GET', depending on your backend
+              // headers: {
+              //     'Content-Type': 'application/json',
+              // },
+          })
+          .then(response => response.text())
+          .then(data => {
+              console.log(data);
+              transactionToken = data;
+              openLightbox();
+              // Handle success here
+          })
+          .catch((error) => {
+              console.log(`Errorcito + ${error}`);
+              // Handle errors here
+          });
+      }
+
+        window.onload = function() {
+          callBackend();
+        };
+
+        function initiateLightbox() {
+            // Assume getToken is an async function that sets the transactionToken
+            getToken().then(function() {
+                // Once the token is set, open the lightbox
+                openLightbox();
+            }).catch(function(error) {
+                // Handle any errors here
+                console.error("Error getting token:", error);
+            });
+        }
+
+        function openLightbox() {
+            var paymentFields = {
+                ssl_txn_auth_token: transactionToken
+            };
+
+            var callback = {
+                onError: function (error) {
+                  console.log(`function is onError`)
+                  window.parent.postMessage(JSON.stringify({
+                    type: 'error',
+                    data: error
+                  }, null, '\t'), 'http://localhost:60143/purchase_barcodes');
+                },
+                onCancelled: function () {
+                  console.log(`function is onCancelled`)
+                  window.parent.postMessage(JSON.stringify({
+                    type: 'canceled',
+                  }, null, '\t'), 'http://localhost:60143/purchase_barcodes');
+                },
+                onDeclined: function (response) {
+                  console.log(`function is onDeclined`)
+                  window.parent.postMessage(JSON.stringify({
+                    type: 'declined',
+                    data: response
+                  }, null, '\t'), 'http://localhost:60143/purchase_barcodes');
+                },
+                onApproval: function (response) {
+                  console.log(`function is onApproval`)
+                  window.parent.postMessage(JSON.stringify({
+                    type: 'approved',
+                    data: response
+                  }, null, '\t'), 'http://localhost:60143/purchase_barcodes');
+                }
+            };
+
+            PayWithConverge.open(paymentFields, callback);
+        }
+
+        function showResult(status, msg) {
+            document.getElementById('txn_status').innerHTML = "<b>" + status + "</b>";
+            document.getElementById('txn_response').innerHTML = msg;
+        }
+    </script>
+</head>
+
+<body>
+    <div id="txn_status"></div>
+    <div id="txn_response"></div>
+</body>
+</html>
