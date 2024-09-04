@@ -71,7 +71,8 @@
                 amount: getParameterByName('amount'),
                 email: getParameterByName('email'),
                 zip: getParameterByName('zip'),
-                address: getParameterByName('address')
+                address: getParameterByName('address'),
+                shipping: getParameterByName('shipping')
             };
             const queryString = Object.keys(params).map(key => encodeURIComponent(key) + '=' + encodeURIComponent(params[key])).join('&');
             return baseUrl + '?' + queryString;

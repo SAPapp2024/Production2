@@ -2,7 +2,6 @@ import 'dart:ui_web' as ui_web;
 
 import 'package:agro_k/components/purchasing_web_view.dart';
 import 'package:agro_k/screens/CompanyTab/purchase_barcodes_screen.dart';
-import 'package:agro_k/utilities/encrypt_utils.dart';
 import 'package:agro_k/utilities/function_utils/view_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:universal_html/html.dart' hide Navigator;
@@ -17,6 +16,7 @@ class PurchasingWebView extends StatefulWidget {
   final bool isAdmin;
   final String? cardToken;
   final bool saveCard;
+  final bool shipping;
 
   const PurchasingWebView(
       {super.key,
@@ -25,6 +25,7 @@ class PurchasingWebView extends StatefulWidget {
       required this.amount,
       required this.email,
       required this.companyId,
+      required this.shipping,
       required this.isAdmin,
       required this.cardToken,
       required this.saveCard});
@@ -47,7 +48,8 @@ class _PurchasingWebViewState extends State<PurchasingWebView> {
         isAdmin: widget.isAdmin,
         cardToken: widget.cardToken,
         saveCard: widget.saveCard,
-        fromMobileApp: false);
+        fromMobileApp: false,
+        shipping: widget.shipping);
     debugPrint("iframeUrl: $iframeUrl");
     ui_web.platformViewRegistry.registerViewFactory(
       iframeId,
@@ -75,12 +77,10 @@ class _PurchasingWebViewState extends State<PurchasingWebView> {
         }
         Navigator.of(context).pop(paymentStatus);
       } catch (e) {
-        debugPrint(
-            'Error al recibir mensaje desde el iframe: $e ${event.data}');
+        debugPrint('Error al recibir mensaje desde el iframe: $e ${event.data}');
         showOneButtonAlertDialog(context, "Ok", () {
           Navigator.of(context).pop();
-        }, "Error",
-            "There was an error getting the response from the payment processor");
+        }, "Error", "There was an error getting the response from the payment processor");
       }
     });
   }

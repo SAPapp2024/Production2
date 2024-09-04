@@ -11,6 +11,7 @@ class PurchasingWebView extends StatelessWidget {
   final bool isAdmin;
   final String? cardToken;
   final bool saveCard;
+  final bool shipping;
 
   const PurchasingWebView(
       {super.key,
@@ -19,6 +20,7 @@ class PurchasingWebView extends StatelessWidget {
       this.amount,
       this.email,
       this.token,
+        required this.shipping,
       required this.companyId,
       required this.isAdmin,
       required this.cardToken, required this.saveCard});

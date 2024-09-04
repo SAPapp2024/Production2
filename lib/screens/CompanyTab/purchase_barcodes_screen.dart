@@ -32,9 +32,7 @@ class PurchaseBarcodesScreen extends StatefulWidget {
   final UserModel user;
   final CompanyModel farm;
 
-  const PurchaseBarcodesScreen(
-      {Key? key, required this.user, required this.farm})
-      : super(key: key);
+  const PurchaseBarcodesScreen({Key? key, required this.user, required this.farm}) : super(key: key);
 
   @override
   State<PurchaseBarcodesScreen> createState() => _PurchaseBarcodesScreenState();
@@ -51,6 +49,30 @@ class _PurchaseBarcodesScreenState extends State<PurchaseBarcodesScreen> {
   CompanyPaymentMethod? companyPaymentMethod;
   var listOfStates = Provinces.usaStates;
   bool useCurrentCard = true;
+
+// Define the first set of data
+  final List<Map<String, String>> shipDataOther = [
+    {'samples': '0-9', 'price': '\$40.00'},
+    {'samples': '10', 'price': '\$37.50'},
+    {'samples': '20', 'price': '\$35.00'},
+    {'samples': '50', 'price': '\$32.50'},
+    {'samples': '100', 'price': '\$30.00'},
+    {'samples': '250', 'price': '\$27.50'},
+    {'samples': '1000', 'price': '\$25.00'},
+  ];
+
+  // Define the second set of data
+  final List<Map<String, String>> shipDataUS = [
+    {'samples': '0-9', 'price': '\$52.50'},
+    {'samples': '10', 'price': '\$45.00'},
+    {'samples': '20', 'price': '\$40.00'},
+    {'samples': '50', 'price': '\$37.50'},
+    {'samples': '100', 'price': '\$35.00'},
+    {'samples': '250', 'price': '\$32.50'},
+    {'samples': '1000', 'price': '\$30.00'},
+  ];
+
+  bool isUSCountry = false;
 
   //Billing address
   var editMode = false;
@@ -71,15 +93,13 @@ class _PurchaseBarcodesScreenState extends State<PurchaseBarcodesScreen> {
     if (TargetPlatform.iOS == defaultTargetPlatform) {
       // listen to uriLinkStream and navigate to dashboard
       uriLinkStream.listen((event) {
-        if (event != null &&
-            event.scheme == "agrokapp" &&
-            event.host == "myapp") {
+        if (event != null && event.scheme == "agrokapp" && event.host == "myapp") {
           context.goNamed(DashboardScreen.id);
         }
       });
     }
-    address.text =
-        "${widget.farm.address}, ${widget.farm.city}, ${widget.farm.state}, ${widget.farm.zipcode}";
+    address.text = "${widget.farm.address}, ${widget.farm.city}, ${widget.farm.state}, ${widget.farm.zipcode}";
+    isUSCountry = widget.farm.country == 'United States';
     getCompanyPaymentMethod();
   }
 
@@ -87,8 +107,7 @@ class _PurchaseBarcodesScreenState extends State<PurchaseBarcodesScreen> {
     setState(() {
       isLoading = true;
     });
-    companyPaymentMethod =
-        await paymentService.getPaymentMethodForCompany(widget.farm.id);
+    companyPaymentMethod = await paymentService.getPaymentMethodForCompany(widget.farm.id);
     debugPrint("companyPaymentMethod = $companyPaymentMethod");
     setState(() {
       if (companyPaymentMethod != null) {
@@ -107,6 +126,7 @@ class _PurchaseBarcodesScreenState extends State<PurchaseBarcodesScreen> {
 
   @override
   Widget build(BuildContext context) {
+    print(widget.farm.country);
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
@@ -149,6 +169,7 @@ class _PurchaseBarcodesScreenState extends State<PurchaseBarcodesScreen> {
                       keyboardType: TextInputType.number,
                     ),
                   ),
+                  buildTableView(),
                   const SizedBox(
                     height: 32,
                   ),
@@ -160,12 +181,9 @@ class _PurchaseBarcodesScreenState extends State<PurchaseBarcodesScreen> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              Text(
-                                  'Card company: ${companyPaymentMethod!.cardCompanyName}'),
-                              Text(
-                                  'Card number: ${companyPaymentMethod!.cardNumber}'),
-                              Text(
-                                  'Card exp date: ${companyPaymentMethod!.formattedExpirationDate()}'),
+                              Text('Card company: ${companyPaymentMethod!.cardCompanyName}'),
+                              Text('Card number: ${companyPaymentMethod!.cardNumber}'),
+                              Text('Card exp date: ${companyPaymentMethod!.formattedExpirationDate()}'),
                             ],
                           ),
                           value: true,
@@ -184,8 +202,7 @@ class _PurchaseBarcodesScreenState extends State<PurchaseBarcodesScreen> {
                             Text('Use new card'),
                             Text(
                               '(you will be prompted to enter card info after clicking submit)',
-                              style: TextStyle(
-                                  color: AppColors.strongGray, fontSize: 12),
+                              style: TextStyle(color: AppColors.strongGray, fontSize: 12),
                             ),
                           ],
                         ),
@@ -223,6 +240,136 @@ class _PurchaseBarcodesScreenState extends State<PurchaseBarcodesScreen> {
                 color: Colors.transparent,
                 child: const Center(child: CircularProgressIndicator()),
               ))
+        ],
+      ),
+    );
+  }
+
+  Widget buildTableView() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            decoration: BoxDecoration(border: Border.all(color: Colors.grey.withOpacity(0.5))),
+            margin: const EdgeInsets.symmetric(vertical: 10),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                IntrinsicHeight(
+                  child: Row(
+                    children: [
+                      const Expanded(
+                        child: Text(
+                          '# of Sample\nLabels',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.strongGray),
+                        ),
+                      ),
+                      VerticalDivider(
+                        thickness: 1,
+                        color: AppColors.strongGray.withOpacity(0.3),
+                      ),
+                      Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 5.0),
+                          child: Text(
+                            '${isUSCountry ? 'Total^' : 'Price'}\n\$ / ea.',
+                            textAlign: TextAlign.center,
+                            style:
+                                const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.strongGray),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Divider(
+                  height: 1,
+                  color: AppColors.strongGray.withOpacity(0.3),
+                ),
+                // Generate rows for the first set of data
+                ...(isUSCountry ? shipDataUS : shipDataOther).map((data) {
+                  int index = (isUSCountry ? shipDataUS : shipDataOther).indexOf(data);
+                  return Column(
+                    children: [
+                      const SizedBox(height: 0),
+                      IntrinsicHeight(
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                data['samples']!,
+                                textAlign: TextAlign.center,
+                                style: const TextStyle(fontSize: 16, color: AppColors.strongGray),
+                              ),
+                            ),
+                            VerticalDivider(
+                              thickness: 1,
+                              color: AppColors.strongGray.withOpacity(0.3),
+                            ),
+                            Expanded(
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(vertical: 2.0),
+                                child: Text(
+                                  data['price']!,
+                                  textAlign: TextAlign.center,
+                                  style: const TextStyle(fontSize: 16, color: AppColors.strongGray),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 0),
+                      Visibility(
+                        visible: index != (isUSCountry ? shipDataUS : shipDataOther).length - 1,
+                        child: Divider(
+                          height: 1,
+                          color: AppColors.strongGray.withOpacity(0.3),
+                        ),
+                      )
+                    ],
+                  );
+                }).toList(),
+              ],
+            ),
+          ),
+          Visibility(
+            visible: !isUSCountry,
+            child: RichText(
+                text: const TextSpan(
+                    text: '*Registered customers can email purchase orders to ',
+                    style: TextStyle(fontSize: 14, color: AppColors.strongGray, height: 1.5),
+                    children: [
+                  TextSpan(
+                      text: ' SAP@agro-k.com',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                      ))
+                ])),
+          ),
+          Visibility(
+            visible: isUSCountry,
+            child: RichText(
+              text: const TextSpan(
+                text: '^Shipping included. US only.\n* Pre-approved customers can email purchase orders to ',
+                style: TextStyle(fontSize: 14, color: AppColors.strongGray, height: 1.5),
+                children: <TextSpan>[
+                  TextSpan(
+                    text: 'SAP@agro-k.com',
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
         ],
       ),
     );
@@ -286,8 +433,7 @@ class _PurchaseBarcodesScreenState extends State<PurchaseBarcodesScreen> {
                               // labelStyle: textStyle,
                               // errorStyle: TextStyle(color: Colors.redAccent, fontSize: 16.0),
                               labelText: 'State/Province',
-                              border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(5.0))),
+                              border: OutlineInputBorder(borderRadius: BorderRadius.circular(5.0))),
                           isEmpty: newState.text == '',
                           child: DropdownButtonHideUnderline(
                             child: DropdownButton<String>(
@@ -369,8 +515,7 @@ class _PurchaseBarcodesScreenState extends State<PurchaseBarcodesScreen> {
   Future<void> buyAssignableBarcodes() async {
     try {
       debugPrint("current card = $useCurrentCard");
-      var validateBarcodeAmount =
-          formKey.currentState != null && formKey.currentState!.validate();
+      var validateBarcodeAmount = formKey.currentState != null && formKey.currentState!.validate();
       if (!validateBarcodeAmount) {
         return;
       }
@@ -384,28 +529,16 @@ class _PurchaseBarcodesScreenState extends State<PurchaseBarcodesScreen> {
             context,
             "Yes",
             () {
-              openPurchaseUrl(
-                  barcodeAmount: barcodeAmount,
-                  isAdmin: isAdmin,
-                  cardToken: cardToken,
-                  saveCard: true);
+              openPurchaseUrl(barcodeAmount: barcodeAmount, isAdmin: isAdmin, cardToken: cardToken, saveCard: true);
             },
             "No",
             () {
-              openPurchaseUrl(
-                  barcodeAmount: barcodeAmount,
-                  isAdmin: isAdmin,
-                  cardToken: cardToken,
-                  saveCard: false);
+              openPurchaseUrl(barcodeAmount: barcodeAmount, isAdmin: isAdmin, cardToken: cardToken, saveCard: false);
             },
             "Save card details",
             "Do you want to save the card details for future purchases?");
       } else {
-        openPurchaseUrl(
-            barcodeAmount: barcodeAmount,
-            isAdmin: isAdmin,
-            cardToken: cardToken,
-            saveCard: false);
+        openPurchaseUrl(barcodeAmount: barcodeAmount, isAdmin: isAdmin, cardToken: cardToken, saveCard: false);
       }
     } on FirebaseException catch (exception, stacktrace) {
       getIt.get<RemoteErrorLoggingService>().recordError(exception, stacktrace);
@@ -435,13 +568,9 @@ class _PurchaseBarcodesScreenState extends State<PurchaseBarcodesScreen> {
   }
 
   Future<void> openPurchaseUrl(
-      {required int barcodeAmount,
-      required bool isAdmin,
-      String? cardToken,
-      required bool saveCard}) async {
+      {required int barcodeAmount, required bool isAdmin, String? cardToken, required bool saveCard}) async {
     if (kIsWeb) {
-      final result = await context.pushNamed<PaymentStatus>(
-          PurchasingWebView.id,
+      final result = await context.pushNamed<PaymentStatus>(PurchasingWebView.id,
           extra: PurchasingWebViewArguments(
               zipcode: widget.farm.zipcode,
               address: widget.farm.address,
@@ -450,7 +579,8 @@ class _PurchaseBarcodesScreenState extends State<PurchaseBarcodesScreen> {
               companyId: widget.farm.id,
               isAdmin: isAdmin,
               cardToken: cardToken,
-              saveCard: saveCard));
+              saveCard: saveCard,
+              shipping: isUSCountry));
       if (mounted && result != PaymentStatus.approved) {
         if (result == null || result == PaymentStatus.canceled) {
           return;
@@ -464,6 +594,17 @@ class _PurchaseBarcodesScreenState extends State<PurchaseBarcodesScreen> {
         context.goNamed(DashboardScreen.id);
       }
     } else {
+      print(buildPaymentUrl(context,
+          companyId: widget.farm.id,
+          address: widget.farm.address,
+          zipcode: widget.farm.zipcode,
+          email: widget.user.email,
+          amount: barcodeAmount,
+          isAdmin: isAdmin,
+          shipping: isUSCountry,
+          cardToken: cardToken,
+          saveCard: saveCard,
+          fromMobileApp: true));
       launchUrl(
           Uri.parse(buildPaymentUrl(context,
               companyId: widget.farm.id,
@@ -472,6 +613,7 @@ class _PurchaseBarcodesScreenState extends State<PurchaseBarcodesScreen> {
               email: widget.user.email,
               amount: barcodeAmount,
               isAdmin: isAdmin,
+              shipping: isUSCountry,
               cardToken: cardToken,
               saveCard: saveCard,
               fromMobileApp: true)),
@@ -487,6 +629,7 @@ String buildPaymentUrl(BuildContext context,
     required String email,
     required int amount,
     required bool isAdmin,
+    required bool shipping,
     String? cardToken,
     required bool saveCard,
     required bool fromMobileApp}) {
@@ -497,13 +640,13 @@ String buildPaymentUrl(BuildContext context,
     "address": address,
     "zip": zipcode,
     "email": email,
+    "shipping": shipping,
     "is_admin": isAdmin ? "1" : "0",
     "card_token": cardToken ?? "",
     "save_card": saveCard ? "1" : "0",
   };
   final token = encryptMap(map);
   debugPrint("token = $token");
-  final paymentUrl =
-      getPaymentUrl(RepositoryProvider.of<Environment>(context, listen: false));
-  return "$paymentUrl?company_id=$companyId&from_mobile_app=${fromMobileApp ? "1" : "0"}&amount=$amount&address=$address&zip=$zipcode&email=$email&is_admin=${isAdmin ? "1" : "0"}&save_card=${saveCard ? "1" : "0"}&verification_token=$token&card_token=${cardToken ?? ""}";
+  final paymentUrl = getPaymentUrl(RepositoryProvider.of<Environment>(context, listen: false));
+  return "$paymentUrl?company_id=$companyId&from_mobile_app=${fromMobileApp ? "1" : "0"}&amount=$amount&address=$address&zip=$zipcode&email=$email&shipping=$shipping&is_admin=${isAdmin ? "1" : "0"}&save_card=${saveCard ? "1" : "0"}&verification_token=$token&card_token=${cardToken ?? ""}";
 }

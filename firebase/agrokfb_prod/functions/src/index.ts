@@ -325,29 +325,51 @@ export const subDeleteFlaggedSamplesAndCreateReport = async () => {
   console.log("todo ok");
 };
 
-function calculateTotalPrice(quantity: number) {
-  let pricePerItem;
+function calculateTotalPrice(quantity: number, shipping: boolean): string {
+  let pricePerItem: number;
 
-  if (quantity >= 0 && quantity < 10) {
-    pricePerItem = 40.0;
-  } else if (quantity >= 10 && quantity < 20) {
-    pricePerItem = 37.5;
-  } else if (quantity >= 20 && quantity < 50) {
-    pricePerItem = 35.0;
-  } else if (quantity >= 50 && quantity < 100) {
-    pricePerItem = 32.5;
-  } else if (quantity >= 100 && quantity < 250) {
-    pricePerItem = 30.0;
-  } else if (quantity >= 250 && quantity < 1000) {
-    pricePerItem = 27.5;
-  } else if (quantity >= 1000) {
-    pricePerItem = 25.0;
+  if (shipping) {
+    // Higher shipping charges
+    if (quantity >= 0 && quantity < 10) {
+      pricePerItem = 52.5;
+    } else if (quantity >= 10 && quantity < 20) {
+      pricePerItem = 45.0;
+    } else if (quantity >= 20 && quantity < 50) {
+      pricePerItem = 40.0;
+    } else if (quantity >= 50 && quantity < 100) {
+      pricePerItem = 37.5;
+    } else if (quantity >= 100 && quantity < 250) {
+      pricePerItem = 35.0;
+    } else if (quantity >= 250 && quantity < 1000) {
+      pricePerItem = 32.5;
+    } else if (quantity >= 1000) {
+      pricePerItem = 30.0;
+    } else {
+      return '0.00';
+    }
   } else {
-    return 0;
+    // Lower shipping charges
+    if (quantity >= 0 && quantity < 10) {
+      pricePerItem = 40.0;
+    } else if (quantity >= 10 && quantity < 20) {
+      pricePerItem = 37.5;
+    } else if (quantity >= 20 && quantity < 50) {
+      pricePerItem = 35.0;
+    } else if (quantity >= 50 && quantity < 100) {
+      pricePerItem = 32.5;
+    } else if (quantity >= 100 && quantity < 250) {
+      pricePerItem = 30.0;
+    } else if (quantity >= 250 && quantity < 1000) {
+      pricePerItem = 27.5;
+    } else if (quantity >= 1000) {
+      pricePerItem = 25.0;
+    } else {
+      return '0.00';
+    }
   }
 
-  var numberRes = quantity * pricePerItem;
-  return numberRes.toFixed(2).toString();
+  const totalPrice = quantity * pricePerItem;
+  return totalPrice.toFixed(2);
 }
 
 const merchantID = "623370"; // Converge Account ID
@@ -363,7 +385,8 @@ export const payWithToken = functions
       const token = req.body.token;
       const amount = req.body.amount;
       const companyId = req.body.companyId;
-      const price = calculateTotalPrice(Number(amount));
+      const shipping = req.body.shipping === 'true';
+      const price = calculateTotalPrice(Number(amount), shipping);
       const invoiceNumber = `${Date.now()}${(
         Math.floor(Math.random() * 10000) + 1
       ).toString()}`;
@@ -440,7 +463,8 @@ export const getConvergePayToken = functions
         const url =
           "https://api.convergepay.com/hosted-payments/transaction_token"; // Converge URL
         const amount = req.body.amount;
-        const price = calculateTotalPrice(Number(amount));
+        const shipping = req.body.shipping === 'true';
+        const price = calculateTotalPrice(Number(amount), shipping);
         const address = req.body.address;
         const zip = req.body.zip;
         const email = req.body.email;
@@ -600,6 +624,7 @@ export const assignBarcodesFromPurchase = functions
             return;
           }
           var companyName = companyData["name"];
+          var country = companyData["country"];
 
           const amount = Number(req.body.amount);
           //get amount barcodes from admin info and add to company, also update global barcodes
@@ -635,6 +660,7 @@ export const assignBarcodesFromPurchase = functions
                   companyName: companyName,
                   dateAddedToFarm: currentDate,
                   wasPurchased: true,
+                  shipping: country.toLowerCase() === 'united states'
                 }
               );
             });

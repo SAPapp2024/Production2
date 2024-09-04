@@ -10,3 +10,4 @@ Future<void> main() async {
   debugPrint("Started main_dev.dart");
   await mainSetup(DefaultFirebaseOptions.currentPlatform, Environment.qa);
 }
+

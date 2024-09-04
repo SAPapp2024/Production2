@@ -53,11 +53,9 @@ class SampleService {
       CompanyModel farm) async {
     await FirebaseFirestore.instance.runTransaction((transaction) async {
       var farmRef = farm.getReference();
-      DocumentReference userRef = FirebaseFirestore.instance
-          .collection('users')
-          .doc(FirebaseAuth.instance.currentUser?.uid);
-      DocumentReference<Map<String, dynamic>> sampleRef =
-          FirebaseFirestore.instance.collection('samples').doc(uuid);
+      DocumentReference userRef =
+          FirebaseFirestore.instance.collection('users').doc(FirebaseAuth.instance.currentUser?.uid);
+      DocumentReference<Map<String, dynamic>> sampleRef = FirebaseFirestore.instance.collection('samples').doc(uuid);
       var newSampleData = <String, dynamic>{
         'id': uuid,
         'sampleDate': newSampleDate,
@@ -70,9 +68,7 @@ class SampleService {
         'notes': notes,
       };
       if (latitude != null && longitude != null) {
-        newSampleData['location'] =
-            SampleLocationModel(latitude: latitude, longitude: longitude)
-                .toJson();
+        newSampleData['location'] = SampleLocationModel(latitude: latitude, longitude: longitude).toJson();
       }
       AssignedBarcodes? newBarcodes;
       if (changeId == null) {
@@ -82,16 +78,13 @@ class SampleService {
           throw Exception("Farm not found");
         }
         List<String> assignableBarcodes =
-            (data["assignableBarcodes"] as List<dynamic>)
-                .map((e) => e as String)
-                .toList();
+            (data["assignableBarcodes"] as List<dynamic>).map((e) => e as String).toList();
         var amountNeeded = youngSample && oldSample ? 2 : 1;
         if (assignableBarcodes.length < amountNeeded) {
           throw NoBarcodesException();
         }
         var barcodesToAssign = assignableBarcodes.take(amountNeeded).toList();
-        transaction.update(farmRef,
-            {"assignableBarcodes": FieldValue.arrayRemove(barcodesToAssign)});
+        transaction.update(farmRef, {"assignableBarcodes": FieldValue.arrayRemove(barcodesToAssign)});
         String? youngSampleBarcode;
         String? oldSampleBarcode;
         if (youngSample) {
@@ -104,11 +97,8 @@ class SampleService {
         }
         newSampleData['youngSampleBarcode'] = youngSampleBarcode;
         newSampleData['oldSampleBarcode'] = oldSampleBarcode;
-        newBarcodes = AssignedBarcodes(
-            youngSampleBarcode: youngSampleBarcode,
-            oldSampleBarcode: oldSampleBarcode);
-        var companyReference =
-            FirebaseFirestore.instance.collection("companies").doc(farm.id);
+        newBarcodes = AssignedBarcodes(youngSampleBarcode: youngSampleBarcode, oldSampleBarcode: oldSampleBarcode);
+        var companyReference = FirebaseFirestore.instance.collection("companies").doc(farm.id);
         newSampleData['companyReference'] = companyReference;
         newSampleData['companyName'] = farm.name;
         newSampleData['userReference'] = userRef;
@@ -119,8 +109,7 @@ class SampleService {
       }
 
       if (changeId != null) {
-        DocumentSnapshot<Map<String, dynamic>> sampleSnapshot =
-            await transaction.get(sampleRef);
+        DocumentSnapshot<Map<String, dynamic>> sampleSnapshot = await transaction.get(sampleRef);
         Map<String, dynamic>? sampleData = sampleSnapshot.data();
         if (sampleData != null) {
           SampleModel sample = SampleModel.fromJson(sampleData);
@@ -144,10 +133,8 @@ class SampleService {
               grower: newGrower,
               notes: notes,
               status: sample.status,
-              youngSampleBarcode:
-                  newBarcodes?.youngSampleBarcode ?? sample.youngSampleBarcode,
-              oldSampleBarcode:
-                  newBarcodes?.oldSampleBarcode ?? sample.oldSampleBarcode);
+              youngSampleBarcode: newBarcodes?.youngSampleBarcode ?? sample.youngSampleBarcode,
+              oldSampleBarcode: newBarcodes?.oldSampleBarcode ?? sample.oldSampleBarcode);
           SampleChangeModel change = SampleChangeModel(
               id: changeId,
               oldSampleState: oldSampleState,
@@ -161,49 +148,37 @@ class SampleService {
         int usedBarcodesCountIncrease = 0;
         transaction.set(sampleRef, newSampleData);
         if (newBarcodes?.youngSampleBarcode != null) {
-          transaction.update(
-              FirebaseFirestore.instance
-                  .collection("global_barcodes")
-                  .doc(newBarcodes!.youngSampleBarcode),
-              {
-                "barcode": newBarcodes.youngSampleBarcode,
-                "companyReference": farm.getReference(),
-                "companyName": farm.name,
-                "sampleReference": sampleRef
-              });
+          transaction
+              .update(FirebaseFirestore.instance.collection("global_barcodes").doc(newBarcodes!.youngSampleBarcode), {
+            "barcode": newBarcodes.youngSampleBarcode,
+            "companyReference": farm.getReference(),
+            "companyName": farm.name,
+            "sampleReference": sampleRef
+          });
           usedBarcodesCountIncrease++;
         }
         if (newBarcodes?.oldSampleBarcode != null) {
-          transaction.update(
-              FirebaseFirestore.instance
-                  .collection("global_barcodes")
-                  .doc(newBarcodes!.oldSampleBarcode),
-              {
-                "barcode": newBarcodes.oldSampleBarcode,
-                "companyReference": farm.getReference(),
-                "companyName": farm.name,
-                "sampleReference": sampleRef
-              });
+          transaction
+              .update(FirebaseFirestore.instance.collection("global_barcodes").doc(newBarcodes!.oldSampleBarcode), {
+            "barcode": newBarcodes.oldSampleBarcode,
+            "companyReference": farm.getReference(),
+            "companyName": farm.name,
+            "sampleReference": sampleRef
+          });
           usedBarcodesCountIncrease++;
         }
-        transaction.update(farmRef, {
-          "usedBarcodesCount": FieldValue.increment(usedBarcodesCountIncrease)
-        });
+        transaction.update(farmRef, {"usedBarcodesCount": FieldValue.increment(usedBarcodesCountIncrease)});
       }
     });
   }
 
   //update sample sample date, also add changes
-  Future<void> updateSampleSampleDate(
-      String id, DateTime newSampleDate, UserModel user) async {
+  Future<void> updateSampleSampleDate(String id, DateTime newSampleDate, UserModel user) async {
     await FirebaseFirestore.instance.runTransaction((transaction) async {
-      DocumentReference userRef = FirebaseFirestore.instance
-          .collection('users')
-          .doc(FirebaseAuth.instance.currentUser?.uid);
-      DocumentReference<Map<String, dynamic>> sampleRef =
-          FirebaseFirestore.instance.collection('samples').doc(id);
-      DocumentSnapshot<Map<String, dynamic>> sampleSnapshot =
-          await transaction.get(sampleRef);
+      DocumentReference userRef =
+          FirebaseFirestore.instance.collection('users').doc(FirebaseAuth.instance.currentUser?.uid);
+      DocumentReference<Map<String, dynamic>> sampleRef = FirebaseFirestore.instance.collection('samples').doc(id);
+      DocumentSnapshot<Map<String, dynamic>> sampleSnapshot = await transaction.get(sampleRef);
       Map<String, dynamic>? sampleData = sampleSnapshot.data();
       if (sampleData != null) {
         SampleModel sample = SampleModel.fromJson(sampleData);
@@ -243,44 +218,25 @@ class SampleService {
     });
   }
 
-  Future<void> saveSampleFieldsData(
-      String newLocationPlot,
-      String newCultivation,
-      String newTreatment,
-      String newCrop,
-      String newVariety,
-      String newGrower,
-      UserModel user,
-      CompanyModel farm) async {
-    var companyReference =
-        FirebaseFirestore.instance.collection("companies").doc(farm.id);
+  Future<void> saveSampleFieldsData(String newLocationPlot, String newCultivation, String newTreatment, String newCrop,
+      String newVariety, String newGrower, UserModel user, CompanyModel farm) async {
+    var companyReference = FirebaseFirestore.instance.collection("companies").doc(farm.id);
     await saveFarmLocation(
-            locationsField: newLocationPlot,
-            cultivationField: newCultivation,
-            companyReference: companyReference)
+            locationsField: newLocationPlot, cultivationField: newCultivation, companyReference: companyReference)
         .timeout(Constants.timeoutDuration);
-    await createCultivationField(
-            user, companyReference, newCultivation, newTreatment)
+    await createCultivationField(user, companyReference, newCultivation, newTreatment)
         .timeout(Constants.timeoutDuration);
-    await createGrowerField(user, companyReference, newGrower, newLocationPlot)
-        .timeout(Constants.timeoutDuration);
-    await createCropAndVarietyFields(
-            user, companyReference, newCrop, newVariety)
-        .timeout(Constants.timeoutDuration);
+    await createGrowerField(user, companyReference, newGrower, newLocationPlot).timeout(Constants.timeoutDuration);
+    await createCropAndVarietyFields(user, companyReference, newCrop, newVariety).timeout(Constants.timeoutDuration);
   }
 
   Future updateSamplePrinted(List<SampleWithUserModel> samples) async {
     var currentDate = DateTime.now();
-    var userRef = FirebaseFirestore.instance
-        .collection('users')
-        .doc(FirebaseAuth.instance.currentUser!.uid);
+    var userRef = FirebaseFirestore.instance.collection('users').doc(FirebaseAuth.instance.currentUser!.uid);
     return Future.wait(samples.map((sampleWithUser) async {
       await FirebaseFirestore.instance.runTransaction((transaction) async {
-        var sampleRef = FirebaseFirestore.instance
-            .collection('samples')
-            .doc(sampleWithUser.sample.id);
-        DocumentSnapshot<Map<String, dynamic>> sampleSnapshot =
-            await transaction.get(sampleRef);
+        var sampleRef = FirebaseFirestore.instance.collection('samples').doc(sampleWithUser.sample.id);
+        DocumentSnapshot<Map<String, dynamic>> sampleSnapshot = await transaction.get(sampleRef);
         Map<String, dynamic>? sampleData = sampleSnapshot.data();
         if (sampleData != null) {
           var samplePrint = {"date": currentDate, "userReference": userRef};
@@ -299,8 +255,7 @@ class SampleService {
       required DocumentReference companyReference}) async {
     companyReference.set({
       'locations': {
-        locationsField: FieldValue.arrayUnion(
-            cultivationField.isNotEmpty ? [cultivationField] : [])
+        locationsField: FieldValue.arrayUnion(cultivationField.isNotEmpty ? [cultivationField] : [])
       }
     }, SetOptions(merge: true));
   }
@@ -339,8 +294,7 @@ class SampleService {
     }
   }
 
-  Future<CompanyModel> getCompanyFromReference(
-      DocumentReference<Map<String, dynamic>> companyReference) async {
+  Future<CompanyModel> getCompanyFromReference(DocumentReference<Map<String, dynamic>> companyReference) async {
     var doc = await companyReference.get();
     var data = doc.data();
     return CompanyModel.fromJson(data!);
@@ -354,10 +308,7 @@ class SampleService {
     await FirebaseFirestore.instance
         .collection("samples")
         .doc(sampleId)
-        .update({
-      'location':
-          SampleLocationModel(latitude: latitude, longitude: longitude).toJson()
-    });
+        .update({'location': SampleLocationModel(latitude: latitude, longitude: longitude).toJson()});
   }
 
   Future<void> createSampleAndSaveData(
@@ -377,23 +328,8 @@ class SampleService {
       double? longitude,
       UserModel user,
       CompanyModel farm) async {
-    await createSample(
-            changeId,
-            uuid,
-            newSampleDate,
-            newLocationPlot,
-            newCultivation,
-            newTreatment,
-            newCrop,
-            newVariety,
-            newGrower,
-            youngSampleBarcode,
-            oldSampleBarcode,
-            notes,
-            latitude,
-            longitude,
-            user,
-            farm)
+    await createSample(changeId, uuid, newSampleDate, newLocationPlot, newCultivation, newTreatment, newCrop,
+            newVariety, newGrower, youngSampleBarcode, oldSampleBarcode, notes, latitude, longitude, user, farm)
         .timeout(Constants.timeoutDuration);
   }
 
@@ -405,11 +341,9 @@ class SampleService {
     }
   }
 
-  Future<List<SampleModel>> getCompanySamples(
-      UserModel user, CompanyModel farm) async {
+  Future<List<SampleModel>> getCompanySamples(UserModel user, CompanyModel farm) async {
     debugPrint("about to search...");
-    var companyReference =
-        FirebaseFirestore.instance.collection("companies").doc(farm.id);
+    var companyReference = FirebaseFirestore.instance.collection("companies").doc(farm.id);
     Query<Map<String, dynamic>> query = FirebaseFirestore.instance
         .collection('samples')
         .where("id", isNull: false)
@@ -428,8 +362,7 @@ class SampleService {
 
   Future<SampleModel?> getSample(String id) async {
     try {
-      var sampleRef =
-          await FirebaseFirestore.instance.collection('samples').doc(id).get();
+      var sampleRef = await FirebaseFirestore.instance.collection('samples').doc(id).get();
       var data = sampleRef.data();
       if (data != null) {
         try {
@@ -447,11 +380,9 @@ class SampleService {
     }
   }
 
-  Future updateSampleStatus(
-      String id, String status, prefix.Environment environment) async {
-    DocumentReference userRef = FirebaseFirestore.instance
-        .collection('users')
-        .doc(FirebaseAuth.instance.currentUser?.uid);
+  Future updateSampleStatus(String id, String status, prefix.Environment environment) async {
+    DocumentReference userRef =
+        FirebaseFirestore.instance.collection('users').doc(FirebaseAuth.instance.currentUser?.uid);
     SampleModel? sample = await getSample(id);
     FieldValue? changesFieldValue;
     if (sample != null) {
@@ -485,10 +416,8 @@ class SampleService {
           changedBy: userRef);
       changesFieldValue = FieldValue.arrayUnion([change.toJson()]);
     }
-    DocumentReference<Map<String, dynamic>> sampleDoc =
-        FirebaseFirestore.instance.collection('samples').doc(id);
-    await sampleDoc
-        .update({"status": status, "changes": changesFieldValue ?? []});
+    DocumentReference<Map<String, dynamic>> sampleDoc = FirebaseFirestore.instance.collection('samples').doc(id);
+    await sampleDoc.update({"status": status, "changes": changesFieldValue ?? []});
   }
 
   Future<void> uploadMinMaxTable(List<MinMaxTableItemModel> data) async {
@@ -539,19 +468,12 @@ class SampleService {
   }
 
   String encodeToFirestore(String text) {
-    return text
-        .replaceAll("~", "")
-        .replaceAll("*", "")
-        .replaceAll("/", "")
-        .replaceAll("[", "")
-        .replaceAll("]", "");
+    return text.replaceAll("~", "").replaceAll("*", "").replaceAll("/", "").replaceAll("[", "").replaceAll("]", "");
   }
 
-  Future<List<CropModel>> searchCrops(String id, String name, bool? isActive,
-      CropSortFilterWrapper sortFilter) async {
+  Future<List<CropModel>> searchCrops(String id, String name, bool? isActive, CropSortFilterWrapper sortFilter) async {
     List<CropModel> cropList = [];
-    var adminInfoRef =
-        await FirebaseFirestore.instance.collection('admin').doc("info").get();
+    var adminInfoRef = await FirebaseFirestore.instance.collection('admin').doc("info").get();
     var data = adminInfoRef.data();
     if (data != null) {
       List<CropModel> crops = (data["crops"] as List<dynamic>)
@@ -568,17 +490,13 @@ class SampleService {
       for (var crop in crops) {
         try {
           var passesIdFilter = id.isEmpty || crop.id == id;
-          var passesNameFilter = name.isEmpty ||
-              crop.name.toLowerCase().contains(name.toLowerCase());
-          var passesStatusFilter =
-              isActive == null || crop.isActive == isActive;
+          var passesNameFilter = name.isEmpty || crop.name.toLowerCase().contains(name.toLowerCase());
+          var passesStatusFilter = isActive == null || crop.isActive == isActive;
           if (passesIdFilter && passesNameFilter && passesStatusFilter) {
             cropList.add(crop);
           }
         } catch (exception, stacktrace) {
-          getIt
-              .get<RemoteErrorLoggingService>()
-              .recordError(exception, stacktrace);
+          getIt.get<RemoteErrorLoggingService>().recordError(exception, stacktrace);
         }
       }
       if (!sortFilter.isEmpty()) {
@@ -588,23 +506,15 @@ class SampleService {
     return cropList;
   }
 
-  Future<void> addUserToGrowerNotificationList(
-      String grower, String email) async {
-    return FirebaseFirestore.instance
-        .collection('grower_notifications')
-        .doc(grower)
-        .set({
+  Future<void> addUserToGrowerNotificationList(String grower, String email) async {
+    return FirebaseFirestore.instance.collection('grower_notifications').doc(grower).set({
       "grower": grower,
       "userEmails": FieldValue.arrayUnion([email]),
     }, SetOptions(merge: true));
   }
 
-  Future<void> deleteUserFromGrowerNotificationList(
-      String grower, String email) async {
-    return FirebaseFirestore.instance
-        .collection('grower_notifications')
-        .doc(grower)
-        .set({
+  Future<void> deleteUserFromGrowerNotificationList(String grower, String email) async {
+    return FirebaseFirestore.instance.collection('grower_notifications').doc(grower).set({
       "grower": grower,
       "userEmails": FieldValue.arrayRemove([email]),
     }, SetOptions(merge: true));
@@ -615,28 +525,20 @@ class SampleService {
     dynamic farmData = (await farm.getReference().get()).data();
     if (farmData == null) throw Exception("Farm doesn't exist");
     farm = CompanyModel.fromJson(farmData);
-    var res = farm.growers.keys
-        .where((grower) => grower.toLowerCase().contains(title.toLowerCase()))
-        .toList();
-    var growerNotifications =
-        ((await farm.getReference().collection("grower_notifications").get())
-                .docs)
-            .where((element) => res.contains(element.id));
+    var res = farm.growers.keys.where((grower) => grower.toLowerCase().contains(title.toLowerCase())).toList();
+    var growerNotifications = ((await farm.getReference().collection("grower_notifications").get()).docs)
+        .where((element) => res.contains(element.id));
     var growerList = (await Future.wait(res.map((growerItem) async {
       try {
-        Map<String, dynamic>? growerItemNotificationsDoc = growerNotifications
-                .firstWhereOrNull((element) => element.id == growerItem)
-            as Map<String, dynamic>?;
+        Map<String, dynamic>? growerItemNotificationsDoc =
+            growerNotifications.firstWhereOrNull((element) => element.id == growerItem) as Map<String, dynamic>?;
         if (growerItemNotificationsDoc != null) {
-          return GrowerWithUserEmailsToNotifyModel.fromJson(
-              growerItemNotificationsDoc);
+          return GrowerWithUserEmailsToNotifyModel.fromJson(growerItemNotificationsDoc);
         } else {
           return GrowerWithUserEmailsToNotifyModel(growerItem, []);
         }
       } catch (exception, stacktrace) {
-        getIt
-            .get<RemoteErrorLoggingService>()
-            .recordError(exception, stacktrace);
+        getIt.get<RemoteErrorLoggingService>().recordError(exception, stacktrace);
         return GrowerWithUserEmailsToNotifyModel(growerItem, []);
       }
     })))
@@ -647,19 +549,16 @@ class SampleService {
       case SortType.none:
         break;
       case SortType.asc:
-        growerList.sort(
-            (a, b) => a.grower.toLowerCase().compareTo(b.grower.toLowerCase()));
+        growerList.sort((a, b) => a.grower.toLowerCase().compareTo(b.grower.toLowerCase()));
         break;
       case SortType.desc:
-        growerList.sort(
-            (b, a) => a.grower.toLowerCase().compareTo(b.grower.toLowerCase()));
+        growerList.sort((b, a) => a.grower.toLowerCase().compareTo(b.grower.toLowerCase()));
         break;
     }
     return growerList;
   }
 
-  Future<UploadItemsResultInfo> uploadGrowers(
-      List<String> growers, CompanyModel farm) async {
+  Future<UploadItemsResultInfo> uploadGrowers(List<String> growers, CompanyModel farm) async {
     return FirebaseFirestore.instance.runTransaction((transaction) async {
       var farmDoc = await transaction.get(farm.getReference());
       var data = farmDoc.data() as Map<String, dynamic>?;
@@ -715,8 +614,7 @@ class SampleService {
     });
   }
 
-  Future<void> editGrower(
-      String growerOldTitle, String growerNewTitle, CompanyModel farm) async {
+  Future<void> editGrower(String growerOldTitle, String growerNewTitle, CompanyModel farm) async {
     await FirebaseFirestore.instance.runTransaction((transaction) async {
       var farmDoc = await transaction.get(farm.getReference());
       var data = farmDoc.data() as Map<String, dynamic>?;
@@ -732,15 +630,13 @@ class SampleService {
     });
   }
 
-  Future<List<BarcodeWrapper>> searchBarcodesGlobalTable(String barcode,
-      String barcodeType, BarcodeSortFilterWrapper sortFilter) async {
+  Future<List<BarcodeWrapper>> searchBarcodesGlobalTable(
+      String barcode, String barcodeType, BarcodeSortFilterWrapper sortFilter) async {
     List<BarcodeWrapper> barcodeList = [];
-    var adminInfoRef =
-        await FirebaseFirestore.instance.collection('admin').doc("info").get();
+    var adminInfoRef = await FirebaseFirestore.instance.collection('admin').doc("info").get();
     var data = adminInfoRef.data();
     if (data != null) {
-      List<BarcodeWrapper> requestableBarcodes = (data["assignableBarcodes"]
-              as List<dynamic>)
+      List<BarcodeWrapper> requestableBarcodes = (data["assignableBarcodes"] as List<dynamic>)
           .map((barcode) => BarcodeWrapper(barcode as String, "Requestable"))
           .toList();
       List<BarcodeWrapper> barcodes = [
@@ -748,17 +644,13 @@ class SampleService {
       ];
       for (var item in barcodes) {
         try {
-          var passesBarcodeFilter = barcode.isEmpty ||
-              item.barcode.toLowerCase().contains(barcode.toLowerCase());
-          var passesBarcodeTypeFilter =
-              barcodeType.isEmpty || item.barcodeType == barcodeType;
+          var passesBarcodeFilter = barcode.isEmpty || item.barcode.toLowerCase().contains(barcode.toLowerCase());
+          var passesBarcodeTypeFilter = barcodeType.isEmpty || item.barcodeType == barcodeType;
           if (passesBarcodeFilter && passesBarcodeTypeFilter) {
             barcodeList.add(item);
           }
         } catch (exception, stacktrace) {
-          getIt
-              .get<RemoteErrorLoggingService>()
-              .recordError(exception, stacktrace);
+          getIt.get<RemoteErrorLoggingService>().recordError(exception, stacktrace);
         }
       }
       if (!sortFilter.isEmpty()) {
@@ -793,17 +685,14 @@ class SampleService {
           .where("companyReference", isEqualTo: farm.getReference())
           .get();
     } else {
-      docs =
-          await FirebaseFirestore.instance.collection("global_barcodes").get();
+      docs = await FirebaseFirestore.instance.collection("global_barcodes").get();
     }
     var barcodes = (await Future.wait(docs.docs.map((e) async {
       try {
         return GlobalBarcodeListItemModel.fromJson(e.data());
       } catch (exception, stacktrace) {
         debugPrint("Error parsing barcode $exception");
-        getIt
-            .get<RemoteErrorLoggingService>()
-            .recordError(exception, stacktrace);
+        getIt.get<RemoteErrorLoggingService>().recordError(exception, stacktrace);
         return null;
       }
     })))
@@ -813,18 +702,14 @@ class SampleService {
       try {
         var passesCreatedDateRangeFilter = createdDateRange == null ||
             item.createdDate != null &&
-                isDateWithinDateRangeDMY(item.createdDate!,
-                    createdDateRange.start, createdDateRange.end);
+                isDateWithinDateRangeDMY(item.createdDate!, createdDateRange.start, createdDateRange.end);
         var passesAddedToFarmDateRangeFilter = addedToFarmDateRange == null ||
             item.dateAddedToCompany != null &&
-                isDateWithinDateRangeDMY(item.dateAddedToCompany!,
-                    addedToFarmDateRange.start, addedToFarmDateRange.end);
-        var passesBarcodeFilter = barcode.isEmpty ||
-            item.barcode.toLowerCase().contains(barcode.toLowerCase());
-        var passesCompanyFilter = companyName.isEmpty ||
-            (item.companyName ?? "")
-                .toLowerCase()
-                .contains(companyName.toLowerCase());
+                isDateWithinDateRangeDMY(
+                    item.dateAddedToCompany!, addedToFarmDateRange.start, addedToFarmDateRange.end);
+        var passesBarcodeFilter = barcode.isEmpty || item.barcode.toLowerCase().contains(barcode.toLowerCase());
+        var passesCompanyFilter =
+            companyName.isEmpty || (item.companyName ?? "").toLowerCase().contains(companyName.toLowerCase());
         if (passesCreatedDateRangeFilter &&
             passesAddedToFarmDateRangeFilter &&
             passesBarcodeFilter &&
@@ -832,9 +717,7 @@ class SampleService {
           barcodeList.add(item);
         }
       } catch (exception, stacktrace) {
-        getIt
-            .get<RemoteErrorLoggingService>()
-            .recordError(exception, stacktrace);
+        getIt.get<RemoteErrorLoggingService>().recordError(exception, stacktrace);
       }
     }
     if (!sortFilter.isEmpty()) {
@@ -920,10 +803,7 @@ class SampleService {
             'per_page': resultsPerPage.toString(),
             'page': currentPage.toString(),
           });
-          var results = await typesenseClient
-              .collection("samples")
-              .documents
-              .search(searchMap);
+          var results = await typesenseClient.collection("samples").documents.search(searchMap);
           var currentHits = results["hits"] as List<dynamic>;
           // debugPrint("currentHits: $currentHits");
           if (currentHits.isEmpty) {
@@ -934,9 +814,7 @@ class SampleService {
                 try {
                   return SampleModel.fromTypesenseJson(e["document"]);
                 } catch (exception, stacktrace) {
-                  getIt
-                      .get<RemoteErrorLoggingService>()
-                      .recordError(exception, stacktrace);
+                  getIt.get<RemoteErrorLoggingService>().recordError(exception, stacktrace);
                   return null;
                 }
               })
@@ -951,24 +829,21 @@ class SampleService {
           var results = await typesenseClient.multiSearch.perform({
             'searches': searchParams,
           }, queryParams: searchMap);
-          var hitListUnflattened =
-              ((results["results"] as List<dynamic>?) ?? [])
-                  .map((e) => (e["hits"] as List<dynamic>)
-                      .map((e) {
-                        try {
-                          var data = e["document"];
-                          return SampleModel.fromTypesenseJson(data);
-                        } catch (exception, stacktrace) {
-                          getIt
-                              .get<RemoteErrorLoggingService>()
-                              .recordError(exception, stacktrace);
-                          return null;
-                        }
-                      })
-                      .whereNotNull()
-                      .toList())
-                  .where((element) => element.isNotEmpty)
-                  .toList();
+          var hitListUnflattened = ((results["results"] as List<dynamic>?) ?? [])
+              .map((e) => (e["hits"] as List<dynamic>)
+                  .map((e) {
+                    try {
+                      var data = e["document"];
+                      return SampleModel.fromTypesenseJson(data);
+                    } catch (exception, stacktrace) {
+                      getIt.get<RemoteErrorLoggingService>().recordError(exception, stacktrace);
+                      return null;
+                    }
+                  })
+                  .whereNotNull()
+                  .toList())
+              .where((element) => element.isNotEmpty)
+              .toList();
           var hitList = hitListUnflattened.flattened.toList();
           if (hitList.isEmpty) {
             break;
@@ -982,9 +857,7 @@ class SampleService {
         try {
           return e.toSampleWithUserModel();
         } catch (exception, stacktrace) {
-          getIt
-              .get<RemoteErrorLoggingService>()
-              .recordError(exception, stacktrace);
+          getIt.get<RemoteErrorLoggingService>().recordError(exception, stacktrace);
           return null;
         }
       })))
@@ -995,61 +868,31 @@ class SampleService {
         try {
           var passesCollectedDateRangeFilter = collectedDateRange == null ||
               sample.sample.sampleDate != null &&
-                  isDateWithinDateRangeDMY(sample.sample.sampleDate!,
-                      collectedDateRange.start, collectedDateRange.end);
+                  isDateWithinDateRangeDMY(sample.sample.sampleDate!, collectedDateRange.start, collectedDateRange.end);
           var passesCreatedDateRangeFilter = createdDateRange == null ||
-              isDateWithinDateRangeDMY(sample.sample.createdDate,
-                  createdDateRange.start, createdDateRange.end);
+              isDateWithinDateRangeDMY(sample.sample.createdDate, createdDateRange.start, createdDateRange.end);
           var passesIdFilter = id == null || sample.sample.id.contains(id);
-          var passesLocationPlotFilter = locationPlot.isEmpty ||
-              sample.sample.farm
-                  .toLowerCase()
-                  .contains(locationPlot.toLowerCase());
-          var passesStatusFilter = status.isEmpty ||
-              sample.sample.status.toLowerCase().contains(status.toLowerCase());
-          var passesCropFilter = crop.isEmpty ||
-              sample.sample.crop.toLowerCase().contains(crop.toLowerCase());
-          var passesCultivationFilter = cultivation.isEmpty ||
-              sample.sample.field
-                  .toLowerCase()
-                  .contains(cultivation.toLowerCase());
-          var passesVarietyFilter = variety.isEmpty ||
-              (sample.sample.variety
-                      ?.toLowerCase()
-                      .contains(variety.toLowerCase()) ??
-                  false);
-          var passesGrowerFilter = grower.isEmpty ||
-              sample.sample.grower
-                      ?.toLowerCase()
-                      .contains(grower.toLowerCase()) ==
-                  true;
-          var passesNotesFilter = notes.isEmpty ||
-              sample.sample.notes.toLowerCase().contains(notes.toLowerCase());
+          var passesLocationPlotFilter =
+              locationPlot.isEmpty || sample.sample.farm.toLowerCase().contains(locationPlot.toLowerCase());
+          var passesStatusFilter = status.isEmpty || sample.sample.status.toLowerCase().contains(status.toLowerCase());
+          var passesCropFilter = crop.isEmpty || sample.sample.crop.toLowerCase().contains(crop.toLowerCase());
+          var passesCultivationFilter =
+              cultivation.isEmpty || sample.sample.field.toLowerCase().contains(cultivation.toLowerCase());
+          var passesVarietyFilter =
+              variety.isEmpty || (sample.sample.variety?.toLowerCase().contains(variety.toLowerCase()) ?? false);
+          var passesGrowerFilter =
+              grower.isEmpty || sample.sample.grower?.toLowerCase().contains(grower.toLowerCase()) == true;
+          var passesNotesFilter = notes.isEmpty || sample.sample.notes.toLowerCase().contains(notes.toLowerCase());
           var passesSampleBarcodeFilter = sampleBarcode.isEmpty ||
-              sample.sample.youngSampleBarcode
-                      ?.toLowerCase()
-                      .contains(sampleBarcode.toLowerCase()) ==
-                  true ||
-              sample.sample.oldSampleBarcode
-                      ?.toLowerCase()
-                      .contains(sampleBarcode.toLowerCase()) ==
-                  true;
-          var passesUserNameFilter = userName.isEmpty ||
-              sample.user
-                      ?.getFullName()!
-                      .toLowerCase()
-                      .contains(userName.toLowerCase()) ==
-                  true;
-          var companyReference =
-              FirebaseFirestore.instance.collection("companies").doc(farm?.id);
-          var passesCompanyReferenceFilter = user.isSuperAdmin
-              ? true
-              : sample.sample.companyReference == companyReference;
-          var passesCompanyNameFilter = farmName.isEmpty ||
-              sample.sample.companyName
-                      ?.toLowerCase()
-                      .contains(farmName.toLowerCase()) ==
-                  true;
+              sample.sample.youngSampleBarcode?.toLowerCase().contains(sampleBarcode.toLowerCase()) == true ||
+              sample.sample.oldSampleBarcode?.toLowerCase().contains(sampleBarcode.toLowerCase()) == true;
+          var passesUserNameFilter =
+              userName.isEmpty || sample.user?.getFullName()!.toLowerCase().contains(userName.toLowerCase()) == true;
+          var companyReference = FirebaseFirestore.instance.collection("companies").doc(farm?.id);
+          var passesCompanyReferenceFilter =
+              user.isSuperAdmin ? true : sample.sample.companyReference == companyReference;
+          var passesCompanyNameFilter =
+              farmName.isEmpty || sample.sample.companyName?.toLowerCase().contains(farmName.toLowerCase()) == true;
           if (passesCollectedDateRangeFilter &&
               passesCreatedDateRangeFilter &&
               passesIdFilter &&
@@ -1068,9 +911,7 @@ class SampleService {
             sampleList.add(sample);
           }
         } catch (exception, stacktrace) {
-          getIt
-              .get<RemoteErrorLoggingService>()
-              .recordError(exception, stacktrace);
+          getIt.get<RemoteErrorLoggingService>().recordError(exception, stacktrace);
         }
       }
       if (!sortFilter.isEmpty()) {
@@ -1082,8 +923,7 @@ class SampleService {
     }
   }
 
-  void sortCropList(
-      CropSortFilterWrapper sortFilter, List<CropModel> cropList) {
+  void sortCropList(CropSortFilterWrapper sortFilter, List<CropModel> cropList) {
     if (sortFilter.field == CropSortFields.id) {
       if (sortFilter.sortType == SortType.asc) {
         cropList.sort((s1, s2) {
@@ -1147,8 +987,7 @@ class SampleService {
     }
   }
 
-  void sortGlobalBarcodeList(BarcodeSortFilterWrapper sortFilter,
-      List<GlobalBarcodeListItemModel> cropList) {
+  void sortGlobalBarcodeList(BarcodeSortFilterWrapper sortFilter, List<GlobalBarcodeListItemModel> cropList) {
     if (sortFilter.field == BarcodeSortFields.barcode) {
       if (sortFilter.sortType == SortType.asc) {
         cropList.sort((s1, s2) {
@@ -1247,11 +1086,28 @@ class SampleService {
           }
         });
       }
+    } else if (sortFilter.field == BarcodeSortFields.shipping) {
+      if (sortFilter.sortType == SortType.asc) {
+        cropList.sort((s1, s2) {
+          if (s1.shipping == s2.shipping) {
+            return 0;
+          } else {
+            return s1.shipping == true ? 1 : -1;
+          }
+        });
+      } else if (sortFilter.sortType == SortType.desc) {
+        cropList.sort((s1, s2) {
+          if (s1.shipping == s2.shipping) {
+            return 0;
+          } else {
+            return s1.shipping == true ? -1 : 1;
+          }
+        });
+      }
     }
   }
 
-  void sortBarcodeList(
-      BarcodeSortFilterWrapper sortFilter, List<BarcodeWrapper> cropList) {
+  void sortBarcodeList(BarcodeSortFilterWrapper sortFilter, List<BarcodeWrapper> cropList) {
     if (sortFilter.field == BarcodeSortFields.barcode) {
       if (sortFilter.sortType == SortType.asc) {
         cropList.sort((s1, s2) {
@@ -1265,8 +1121,7 @@ class SampleService {
     }
   }
 
-  void sortSampleList(SampleSortFilterWrapper sortFilter,
-      List<SampleWithUserModel> sampleList) {
+  void sortSampleList(SampleSortFilterWrapper sortFilter, List<SampleWithUserModel> sampleList) {
     if (sortFilter.field == SampleSortFields.collectedDate) {
       if (sortFilter.sortType == SortType.asc) {
         sampleList.sort((s1, s2) {
@@ -1406,23 +1261,17 @@ class SampleService {
     } else if (sortFilter.field == SampleSortFields.sampleBarcodes) {
       if (sortFilter.sortType == SortType.asc) {
         sampleList.sort((s1, s2) {
-          if (s1.sample.youngSampleBarcode != null ||
-              s2.sample.youngSampleBarcode != null) {
-            if (s1.sample.youngSampleBarcode != null &&
-                s2.sample.youngSampleBarcode != null) {
-              return s1.sample.youngSampleBarcode!
-                  .compareTo(s2.sample.youngSampleBarcode!);
+          if (s1.sample.youngSampleBarcode != null || s2.sample.youngSampleBarcode != null) {
+            if (s1.sample.youngSampleBarcode != null && s2.sample.youngSampleBarcode != null) {
+              return s1.sample.youngSampleBarcode!.compareTo(s2.sample.youngSampleBarcode!);
             } else if (s1.sample.youngSampleBarcode != null) {
               return -1;
             } else {
               return 1;
             }
-          } else if (s1.sample.oldSampleBarcode != null ||
-              s2.sample.oldSampleBarcode != null) {
-            if (s1.sample.oldSampleBarcode != null &&
-                s2.sample.oldSampleBarcode != null) {
-              return s1.sample.oldSampleBarcode!
-                  .compareTo(s2.sample.oldSampleBarcode!);
+          } else if (s1.sample.oldSampleBarcode != null || s2.sample.oldSampleBarcode != null) {
+            if (s1.sample.oldSampleBarcode != null && s2.sample.oldSampleBarcode != null) {
+              return s1.sample.oldSampleBarcode!.compareTo(s2.sample.oldSampleBarcode!);
             } else if (s1.sample.oldSampleBarcode != null) {
               return -1;
             } else {
@@ -1440,8 +1289,7 @@ class SampleService {
           if (s2.sample.oldSampleBarcode == null) {
             return -1;
           }
-          return -s1.sample.oldSampleBarcode!
-              .compareTo(s2.sample.oldSampleBarcode!);
+          return -s1.sample.oldSampleBarcode!.compareTo(s2.sample.oldSampleBarcode!);
         });
       }
     } else if (sortFilter.field == SampleSortFields.user) {
@@ -1511,13 +1359,8 @@ class SampleService {
   }
 
   Future<List<SampleWithUserModel>> searchCompanySamples(
-      String filterName,
-      String searchText,
-      UserModel user,
-      CompanyModel farm,
-      Client typesenseClient) async {
-    var companyReference =
-        FirebaseFirestore.instance.collection("companies").doc(farm.id);
+      String filterName, String searchText, UserModel user, CompanyModel farm, Client typesenseClient) async {
+    var companyReference = FirebaseFirestore.instance.collection("companies").doc(farm.id);
     Map<String, dynamic> searchBody = {};
     var filter = filterLabelToTypesenseFilter(filterName);
     var currentPage = 1;
@@ -1536,10 +1379,7 @@ class SampleService {
     List<SampleWithUserModel> hits = [];
     while (true) {
       searchBody["page"] = currentPage.toString();
-      var results = await typesenseClient
-          .collection("samples")
-          .documents
-          .search(searchBody);
+      var results = await typesenseClient.collection("samples").documents.search(searchBody);
       var currentHits = results["hits"] as List<dynamic>;
       if (currentHits.isEmpty) {
         break;
@@ -1549,9 +1389,7 @@ class SampleService {
           var sample = SampleModel.fromTypesenseJson(e["document"]);
           return sample.toSampleWithUserModel();
         } catch (exception, stacktrace) {
-          getIt
-              .get<RemoteErrorLoggingService>()
-              .recordError(exception, stacktrace);
+          getIt.get<RemoteErrorLoggingService>().recordError(exception, stacktrace);
           return null;
         }
       })))
@@ -1563,40 +1401,27 @@ class SampleService {
       currentPage++;
     }
     bool userIsAdmin = user.companyReferences
-            .where((companyReferenceItem) =>
-                companyReferenceItem.companyReference == companyReference)
+            .where((companyReferenceItem) => companyReferenceItem.companyReference == companyReference)
             .firstOrNull
             ?.isAdmin ??
         false || user.isSuperAdmin;
     List<SampleWithUserModel> sampleList = [];
     for (var sample in hits) {
-      if (!sample.sample.deleted &&
-          (userIsAdmin ||
-              sample.user?.id == user.id ||
-              sample.assignedTo?.id == user.id)) {
+      if (!sample.sample.deleted && (userIsAdmin || sample.user?.id == user.id || sample.assignedTo?.id == user.id)) {
         if (filter == "grower") {
-          if ((sample.sample.grower
-                  ?.toLowerCase()
-                  .contains(searchText.toLowerCase()) ??
-              false)) {
+          if ((sample.sample.grower?.toLowerCase().contains(searchText.toLowerCase()) ?? false)) {
             sampleList.add(sample);
           }
         } else if (filter == "crop") {
-          if (sample.sample.crop
-              .toLowerCase()
-              .contains(searchText.toLowerCase())) {
+          if (sample.sample.crop.toLowerCase().contains(searchText.toLowerCase())) {
             sampleList.add(sample);
           }
         } else if (filter == "locationPlot") {
-          if (sample.sample.farm
-              .toLowerCase()
-              .contains(searchText.toLowerCase())) {
+          if (sample.sample.farm.toLowerCase().contains(searchText.toLowerCase())) {
             sampleList.add(sample);
           }
         } else if (filter == "field") {
-          if (sample.sample.field
-              .toLowerCase()
-              .contains(searchText.toLowerCase())) {
+          if (sample.sample.field.toLowerCase().contains(searchText.toLowerCase())) {
             sampleList.add(sample);
           }
         } else if (filter == "sampleDate") {
@@ -1606,10 +1431,8 @@ class SampleService {
             final startDate = onlyDMY(DateFormat.yMd().parse(dateRangeSplitted[0]));
             final endDate = onlyDMY(DateFormat.yMd().parse(dateRangeSplitted[1]));
             if (sampleDate?.millisecondsSinceEpoch != null &&
-                sampleDate!.millisecondsSinceEpoch >=
-                    startDate.millisecondsSinceEpoch &&
-                sampleDate.millisecondsSinceEpoch <=
-                    endDate.millisecondsSinceEpoch) {
+                sampleDate!.millisecondsSinceEpoch >= startDate.millisecondsSinceEpoch &&
+                sampleDate.millisecondsSinceEpoch <= endDate.millisecondsSinceEpoch) {
               sampleList.add(sample);
             }
           } catch (_) {
@@ -1621,10 +1444,8 @@ class SampleService {
             final dateRangeSplitted = searchText.split(" - ");
             final startDate = onlyDMY(DateFormat.yMd().parse(dateRangeSplitted[0]));
             final endDate = onlyDMY(DateFormat.yMd().parse(dateRangeSplitted[1]));
-            if (createdDate.millisecondsSinceEpoch >=
-                    startDate.millisecondsSinceEpoch &&
-                createdDate.millisecondsSinceEpoch <=
-                    endDate.millisecondsSinceEpoch) {
+            if (createdDate.millisecondsSinceEpoch >= startDate.millisecondsSinceEpoch &&
+                createdDate.millisecondsSinceEpoch <= endDate.millisecondsSinceEpoch) {
               sampleList.add(sample);
             }
           } catch (_) {
@@ -1642,14 +1463,12 @@ class SampleService {
       if (s2.sample.sampleDate == null) {
         return -1;
       }
-      return -s1.sample.sampleDate!.millisecondsSinceEpoch
-          .compareTo(s2.sample.sampleDate!.millisecondsSinceEpoch);
+      return -s1.sample.sampleDate!.millisecondsSinceEpoch.compareTo(s2.sample.sampleDate!.millisecondsSinceEpoch);
     });
     return sampleList;
   }
 
-  Future<AssignedBarcodes?> getAvailableBarcodes(
-      CompanyModel farm, bool youngSample, bool oldSample) async {
+  Future<AssignedBarcodes?> getAvailableBarcodes(CompanyModel farm, bool youngSample, bool oldSample) async {
     try {
       return FirebaseFirestore.instance.runTransaction((transaction) async {
         var farmRef = farm.getReference();
@@ -1657,18 +1476,13 @@ class SampleService {
         var data = farmDoc.data() as Map<String, dynamic>?;
         if (data != null) {
           List<String> assignableBarcodes =
-              (data["assignableBarcodes"] as List<dynamic>)
-                  .map((e) => e as String)
-                  .toList();
+              (data["assignableBarcodes"] as List<dynamic>).map((e) => e as String).toList();
           var amountNeeded = youngSample && oldSample ? 2 : 1;
           if (assignableBarcodes.length < amountNeeded) {
             throw NoBarcodesException();
           } else {
-            var barcodesToAssign =
-                assignableBarcodes.take(amountNeeded).toList();
-            transaction.update(farmRef, {
-              "assignableBarcodes": FieldValue.arrayRemove(barcodesToAssign)
-            });
+            var barcodesToAssign = assignableBarcodes.take(amountNeeded).toList();
+            transaction.update(farmRef, {"assignableBarcodes": FieldValue.arrayRemove(barcodesToAssign)});
             String? youngSampleBarcode;
             String? oldSampleBarcode;
             if (youngSample) {
@@ -1679,9 +1493,7 @@ class SampleService {
               oldSampleBarcode = barcodesToAssign.first;
               barcodesToAssign.removeAt(0);
             }
-            var res = AssignedBarcodes(
-                youngSampleBarcode: youngSampleBarcode,
-                oldSampleBarcode: oldSampleBarcode);
+            var res = AssignedBarcodes(youngSampleBarcode: youngSampleBarcode, oldSampleBarcode: oldSampleBarcode);
             return res;
           }
         }
@@ -1692,12 +1504,10 @@ class SampleService {
     }
   }
 
-  Future<void> addBarcodesToCompany(
-      CompanyModel farm, int amount, bool isPurchase) async {
+  Future<void> addBarcodesToCompany(CompanyModel farm, int amount, bool isPurchase) async {
     DateTime currentDate = DateTime.now();
     await FirebaseFirestore.instance.runTransaction((transaction) async {
-      var adminInfoDoc = await transaction
-          .get(FirebaseFirestore.instance.collection('admin').doc("info"));
+      var adminInfoDoc = await transaction.get(FirebaseFirestore.instance.collection('admin').doc("info"));
       var data = adminInfoDoc.data();
       if (data != null) {
         var adminInfo = AdminInfoModel.fromJson(data);
@@ -1710,40 +1520,29 @@ class SampleService {
         });
         transaction.update(farm.getReference(), {
           "assignableBarcodes": FieldValue.arrayUnion(newBarcodes),
-          isPurchase ? "barcodesPurchased" : "barcodesAssigned":
-              FieldValue.increment(amount),
+          isPurchase ? "barcodesPurchased" : "barcodesAssigned": FieldValue.increment(amount),
         });
         for (var barcode in newBarcodes) {
-          transaction.update(
-              FirebaseFirestore.instance
-                  .collection("global_barcodes")
-                  .doc(barcode),
-              {
-                "companyReference": farm.getReference(),
-                "companyName": farm.name,
-                "dateAddedToFarm": currentDate,
-                "wasPurchased": isPurchase,
-              });
+          transaction.update(FirebaseFirestore.instance.collection("global_barcodes").doc(barcode), {
+            "companyReference": farm.getReference(),
+            "companyName": farm.name,
+            "dateAddedToFarm": currentDate,
+            "wasPurchased": isPurchase,
+          });
         }
       }
     });
   }
 
-  Future<BarcodeUploadResultInfo> uploadBarcodes(
-      List<GlobalBarcodeListItemModel> barcodes) async {
+  Future<BarcodeUploadResultInfo> uploadBarcodes(List<GlobalBarcodeListItemModel> barcodes) async {
     try {
-      var adminBarcodesDocs = (await Future.wait((await ((FirebaseFirestore
-                      .instance
-                      .collection('global_barcodes')
-                      .get())
-                  .then((value) => value.docs)))
-              .map((e) async {
+      var adminBarcodesDocs = (await Future.wait(
+              (await ((FirebaseFirestore.instance.collection('global_barcodes').get()).then((value) => value.docs)))
+                  .map((e) async {
         try {
           return GlobalBarcodeListItemModel.fromJson(e.data());
         } catch (exception, stacktrace) {
-          getIt
-              .get<RemoteErrorLoggingService>()
-              .recordError(exception, stacktrace);
+          getIt.get<RemoteErrorLoggingService>().recordError(exception, stacktrace);
           return null;
         }
       })))
@@ -1755,8 +1554,8 @@ class SampleService {
       var duplicatedBarcodes = <String>[];
       for (var barcode in barcodes) {
         if (!usedBarcodes.contains(barcode.barcode)) {
-          var globalBarcodeItem = GlobalBarcodeListItemModel(barcode.barcode,
-              null, null, null, DateTime.now(), null, null, []);
+          var globalBarcodeItem =
+              GlobalBarcodeListItemModel(barcode.barcode, null, null, null, DateTime.now(), null, null, [], false);
           usedBarcodes.add(barcode.barcode);
           newBarcodes.add(globalBarcodeItem);
           requestableList.add(barcode.barcode);
@@ -1768,8 +1567,7 @@ class SampleService {
       var requestableListSlices = requestableList.slices(500);
       for (var slice in requestableListSlices) {
         firestoreBatch = FirebaseFirestore.instance.batch();
-        firestoreBatch.update(
-            FirebaseFirestore.instance.collection('admin').doc("info"), {
+        firestoreBatch.update(FirebaseFirestore.instance.collection('admin').doc("info"), {
           "assignableBarcodes": FieldValue.arrayUnion(slice),
         });
         await firestoreBatch.commit();
@@ -1779,9 +1577,7 @@ class SampleService {
         firestoreBatch = FirebaseFirestore.instance.batch();
         for (var barcode in slice) {
           firestoreBatch.set(
-            FirebaseFirestore.instance
-                .collection("global_barcodes")
-                .doc(barcode.barcode),
+            FirebaseFirestore.instance.collection("global_barcodes").doc(barcode.barcode),
             barcode.toJson(),
             SetOptions(merge: true),
           );
@@ -1789,16 +1585,14 @@ class SampleService {
         await firestoreBatch.commit();
       }
       return BarcodeUploadResultInfo(
-          duplicatedBarcodesCount: duplicatedBarcodes.length,
-          newBarcodesCount: newBarcodes.length);
+          duplicatedBarcodesCount: duplicatedBarcodes.length, newBarcodesCount: newBarcodes.length);
     } on FirebaseException catch (_) {
       rethrow;
     }
   }
 
   Future<void> uploadCrops(List<CropModel> newCrops) async {
-    var adminInfoRef =
-        await FirebaseFirestore.instance.collection('admin').doc("info").get();
+    var adminInfoRef = await FirebaseFirestore.instance.collection('admin').doc("info").get();
     var data = adminInfoRef.data();
     if (data != null) {
       List<CropModel> crops = (data["crops"] as List<dynamic>)
@@ -1813,8 +1607,7 @@ class SampleService {
           .map((e) => e!)
           .toList();
       List<CropModel> cropsWithNoRepeatedNames = crops
-          .where((crop) => !newCrops.any((newCrop) =>
-              newCrop.name.toLowerCase() == crop.name.toLowerCase()))
+          .where((crop) => !newCrops.any((newCrop) => newCrop.name.toLowerCase() == crop.name.toLowerCase()))
           .toList(); //remove crops from Firestore that have the same name as any crop inside newCrops
       List<Map<String, dynamic>> joinedCrops = [
         ...cropsWithNoRepeatedNames.map((e) => e.toJson()),
@@ -1827,8 +1620,7 @@ class SampleService {
   }
 
   Future<void> createCrop(String cropName, bool isActive) async {
-    var adminInfoRef =
-        await FirebaseFirestore.instance.collection('admin').doc("info").get();
+    var adminInfoRef = await FirebaseFirestore.instance.collection('admin').doc("info").get();
     var data = adminInfoRef.data();
     if (data != null) {
       List<CropModel> crops = (data["crops"] as List<dynamic>)
@@ -1842,8 +1634,7 @@ class SampleService {
           .where((e) => e != null)
           .map((e) => e!)
           .toList();
-      if (crops.any(
-          (newCrop) => newCrop.name.toLowerCase() == cropName.toLowerCase())) {
+      if (crops.any((newCrop) => newCrop.name.toLowerCase() == cropName.toLowerCase())) {
         throw CropNameAlreadyExistsException();
       }
       int id = 0;
@@ -1857,44 +1648,31 @@ class SampleService {
       }
       id++;
       await FirebaseFirestore.instance.collection('admin').doc("info").update({
-        "crops": FieldValue.arrayUnion([
-          CropModel(id: id.toString(), name: cropName, isActive: isActive)
-              .toJson()
-        ]),
+        "crops": FieldValue.arrayUnion([CropModel(id: id.toString(), name: cropName, isActive: isActive).toJson()]),
       });
     }
   }
 
   Future<void> createBarcode(String barcode) async {
     await FirebaseFirestore.instance.runTransaction((transaction) async {
-      var adminInfoRef = await transaction
-          .get(FirebaseFirestore.instance.collection('admin').doc("info"));
-      var globalBarcodeItem = await transaction.get(FirebaseFirestore.instance
-          .collection("global_barcodes")
-          .doc(barcode));
+      var adminInfoRef = await transaction.get(FirebaseFirestore.instance.collection('admin').doc("info"));
+      var globalBarcodeItem =
+          await transaction.get(FirebaseFirestore.instance.collection("global_barcodes").doc(barcode));
       if (globalBarcodeItem.data() != null) {
         throw BarcodeAlreadyExistsException();
       }
       if (adminInfoRef.data() != null) {
         var adminInfoData = adminInfoRef.data()!;
         List<String> requestableBarcodes =
-            (adminInfoData["assignableBarcodes"] as List<dynamic>)
-                .map((e) => e as String)
-                .toList();
+            (adminInfoData["assignableBarcodes"] as List<dynamic>).map((e) => e as String).toList();
         if (requestableBarcodes.contains(barcode)) {
           throw BarcodeAlreadyExistsException();
         }
-        transaction.update(
-            FirebaseFirestore.instance.collection('admin').doc("info"), {
+        transaction.update(FirebaseFirestore.instance.collection('admin').doc("info"), {
           "assignableBarcodes": FieldValue.arrayUnion([barcode]),
         });
-        transaction.set(
-            FirebaseFirestore.instance
-                .collection('global_barcodes')
-                .doc(barcode),
-            GlobalBarcodeListItemModel(
-                    barcode, null, null, null, DateTime.now(), null, null, [])
-                .toJson());
+        transaction.set(FirebaseFirestore.instance.collection('global_barcodes').doc(barcode),
+            GlobalBarcodeListItemModel(barcode, null, null, null, DateTime.now(), null, null, [], false).toJson());
       }
     });
   }
@@ -1904,14 +1682,12 @@ class SampleService {
     return barcodeRegex.hasMatch(barcode);
   }
 
-  Future<void> sendUnavailableBarcodeEmail(
-      String barcode, CompanyModel farmModel, UserModel userModel) async {
+  Future<void> sendUnavailableBarcodeEmail(String barcode, CompanyModel farmModel, UserModel userModel) async {
     var mailData = {
       'to': "sap@agro-k.com",
       'message': {
         "subject": "Unavailable barcode alert",
-        "html":
-            """<p>Company ${farmModel.name} tried to scan barcode $barcode which is not available.</p>"""
+        "html": """<p>Company ${farmModel.name} tried to scan barcode $barcode which is not available.</p>"""
       },
     };
 
@@ -1920,50 +1696,35 @@ class SampleService {
 
   //create cultivation field on the farm profile
   Future<void> createCultivationField(
-      UserModel user,
-      DocumentReference companyReference,
-      String cultivationField,
-      String treatmentField) async {
+      UserModel user, DocumentReference companyReference, String cultivationField, String treatmentField) async {
     await companyReference.set({
       'fields': {
-        cultivationField: FieldValue.arrayUnion(
-            treatmentField.isNotEmpty ? [treatmentField] : [])
+        cultivationField: FieldValue.arrayUnion(treatmentField.isNotEmpty ? [treatmentField] : [])
       }
     }, SetOptions(merge: true));
   }
 
   Future<void> createGrowerField(
-      UserModel user,
-      DocumentReference companyReference,
-      String growerField,
-      String locationField) async {
+      UserModel user, DocumentReference companyReference, String growerField, String locationField) async {
     await companyReference.set({
       'growers': {
-        growerField: FieldValue.arrayUnion(
-            locationField.isNotEmpty ? [locationField] : [])
+        growerField: FieldValue.arrayUnion(locationField.isNotEmpty ? [locationField] : [])
       }
     }, SetOptions(merge: true));
   }
 
   Future<void> createCropAndVarietyFields(
-      UserModel user,
-      DocumentReference companyReference,
-      String cropField,
-      String varietyField) async {
+      UserModel user, DocumentReference companyReference, String cropField, String varietyField) async {
     await companyReference.set({
       'crops': {
-        cropField:
-            FieldValue.arrayUnion(varietyField.isNotEmpty ? [varietyField] : [])
+        cropField: FieldValue.arrayUnion(varietyField.isNotEmpty ? [varietyField] : [])
       }
     }, SetOptions(merge: true));
   }
 
   Future<List<CropModel>> getActiveCrops() async {
     try {
-      var adminInfoRef = await FirebaseFirestore.instance
-          .collection('admin')
-          .doc("info")
-          .get();
+      var adminInfoRef = await FirebaseFirestore.instance.collection('admin').doc("info").get();
       var data = adminInfoRef.data();
       if (data != null) {
         return (data["crops"] as List<dynamic>)
@@ -1987,10 +1748,7 @@ class SampleService {
 
   Future<List<CropModel>> getCrops() async {
     try {
-      var adminInfoRef = await FirebaseFirestore.instance
-          .collection('admin')
-          .doc("info")
-          .get();
+      var adminInfoRef = await FirebaseFirestore.instance.collection('admin').doc("info").get();
       var data = adminInfoRef.data();
       if (data != null) {
         return (data["crops"] as List<dynamic>)
@@ -2013,8 +1771,7 @@ class SampleService {
   }
 
   Future<void> editCrop(String id, String name, bool isActive) async {
-    var adminInfoRef =
-        await FirebaseFirestore.instance.collection('admin').doc("info").get();
+    var adminInfoRef = await FirebaseFirestore.instance.collection('admin').doc("info").get();
     var data = adminInfoRef.data();
     if (data == null) return;
     List<CropModel> crops = (data["crops"] as List<dynamic>)
@@ -2028,35 +1785,27 @@ class SampleService {
         .where((e) => e != null)
         .map((e) => e!)
         .toList();
-    CropModel? cropById =
-        crops.where((element) => element.id == id).toList().firstOrNull;
+    CropModel? cropById = crops.where((element) => element.id == id).toList().firstOrNull;
     if (cropById != null) {
       cropById.name = name;
       cropById.isActive = isActive;
-      await FirebaseFirestore.instance
-          .collection('admin')
-          .doc("info")
-          .update({"crops": crops.map((e) => e.toJson())});
+      await FirebaseFirestore.instance.collection('admin').doc("info").update({"crops": crops.map((e) => e.toJson())});
     }
   }
 
-  Future<void> reclaimSampleBarcodesToCompany(
-      String sampleId, String companyId) async {
+  Future<void> reclaimSampleBarcodesToCompany(String sampleId, String companyId) async {
     return FirebaseFirestore.instance.runTransaction((transaction) async {
-      var sampleRef =
-          FirebaseFirestore.instance.collection("samples").doc(sampleId);
+      var sampleRef = FirebaseFirestore.instance.collection("samples").doc(sampleId);
       var sampleData = (await transaction.get(sampleRef)).data();
       if (sampleData == null) throw Exception("Sample doesn't exist");
-      var companyRef =
-          FirebaseFirestore.instance.collection("companies").doc(companyId);
+      var companyRef = FirebaseFirestore.instance.collection("companies").doc(companyId);
       var companyData = (await transaction.get(companyRef)).data();
       if (companyData == null) throw Exception("Company doesn't exist");
       var sample = SampleModel.fromJson(sampleData);
       if (sample.deleted || sample.deletedAt != null) {
         throw Exception("Sample is already deleted");
       }
-      if (sample.youngSampleBarcode == null &&
-          sample.oldSampleBarcode == null) {
+      if (sample.youngSampleBarcode == null && sample.oldSampleBarcode == null) {
         throw Exception("Sample doesn't have any barcodes");
       }
       var youngSampleBarcode = sample.youngSampleBarcode;
@@ -2076,24 +1825,16 @@ class SampleService {
       };
       if (barcodesToUpdate.isNotEmpty) {
         Map<String, dynamic> companyUpdateMap = {};
-        companyUpdateMap["usedBarcodesCount"] =
-            FieldValue.increment(barcodesToUpdate.length * -1);
-        companyUpdateMap["assignableBarcodes"] =
-            FieldValue.arrayUnion(barcodesToUpdate);
-        var userReference = FirebaseFirestore.instance
-            .collection("users")
-            .doc(FirebaseAuth.instance.currentUser!.uid);
+        companyUpdateMap["usedBarcodesCount"] = FieldValue.increment(barcodesToUpdate.length * -1);
+        companyUpdateMap["assignableBarcodes"] = FieldValue.arrayUnion(barcodesToUpdate);
+        var userReference = FirebaseFirestore.instance.collection("users").doc(FirebaseAuth.instance.currentUser!.uid);
         for (var barcode in barcodesToUpdate) {
-          transaction.update(
-              FirebaseFirestore.instance
-                  .collection('global_barcodes')
-                  .doc(barcode),
-              {
-                "sampleReference": FieldValue.delete(),
-                "reclaimedTimestamps": FieldValue.arrayUnion([
-                  {"date": DateTime.now(), "userReference": userReference}
-                ])
-              });
+          transaction.update(FirebaseFirestore.instance.collection('global_barcodes').doc(barcode), {
+            "sampleReference": FieldValue.delete(),
+            "reclaimedTimestamps": FieldValue.arrayUnion([
+              {"date": DateTime.now(), "userReference": userReference}
+            ])
+          });
         }
         transaction.update(companyRef, companyUpdateMap);
       }
@@ -2101,15 +1842,12 @@ class SampleService {
     });
   }
 
-  Future<void> reclaimOneSampleBarcodeToCompany(
-      String sampleId, String companyId, bool youngBarcode) async {
+  Future<void> reclaimOneSampleBarcodeToCompany(String sampleId, String companyId, bool youngBarcode) async {
     return FirebaseFirestore.instance.runTransaction((transaction) async {
-      var sampleRef =
-      FirebaseFirestore.instance.collection("samples").doc(sampleId);
+      var sampleRef = FirebaseFirestore.instance.collection("samples").doc(sampleId);
       var sampleData = (await transaction.get(sampleRef)).data();
       if (sampleData == null) throw Exception("Sample doesn't exist");
-      var companyRef =
-      FirebaseFirestore.instance.collection("companies").doc(companyId);
+      var companyRef = FirebaseFirestore.instance.collection("companies").doc(companyId);
       var companyData = (await transaction.get(companyRef)).data();
       if (companyData == null) throw Exception("Company doesn't exist");
       var sample = SampleModel.fromJson(sampleData);
@@ -2122,76 +1860,63 @@ class SampleService {
         barcodeFieldToUpdate: FieldValue.delete(),
       };
       Map<String, dynamic> companyUpdateMap = {};
-      companyUpdateMap["usedBarcodesCount"] =
-          FieldValue.increment(-1);
-      companyUpdateMap["assignableBarcodes"] =
-          FieldValue.arrayUnion([barcodeReclaimed]);
-      var userReference = FirebaseFirestore.instance
-          .collection("users")
-          .doc(FirebaseAuth.instance.currentUser!.uid);
-      transaction.update(
-          FirebaseFirestore.instance
-              .collection('global_barcodes')
-              .doc(barcodeReclaimed),
-          {
-            "sampleReference": FieldValue.delete(),
-            "reclaimedTimestamps": FieldValue.arrayUnion([
-              {"date": DateTime.now(), "userReference": userReference}
-            ])
-          });
+      companyUpdateMap["usedBarcodesCount"] = FieldValue.increment(-1);
+      companyUpdateMap["assignableBarcodes"] = FieldValue.arrayUnion([barcodeReclaimed]);
+      var userReference = FirebaseFirestore.instance.collection("users").doc(FirebaseAuth.instance.currentUser!.uid);
+      transaction.update(FirebaseFirestore.instance.collection('global_barcodes').doc(barcodeReclaimed), {
+        "sampleReference": FieldValue.delete(),
+        "reclaimedTimestamps": FieldValue.arrayUnion([
+          {"date": DateTime.now(), "userReference": userReference}
+        ])
+      });
       transaction.update(companyRef, companyUpdateMap);
       transaction.update(sampleRef, sampleUpdateMap);
     });
   }
 
-  Future<void> reclaimBarcodes(
-      List<GlobalBarcodeListItemModel> barcodes) async {
+  Future<void> reclaimBarcodes(List<GlobalBarcodeListItemModel> barcodes) async {
     await FirebaseFirestore.instance.runTransaction((transaction) async {
-      var userReference = FirebaseFirestore.instance
-          .collection("users")
-          .doc(FirebaseAuth.instance.currentUser!.uid);
+      var userReference = FirebaseFirestore.instance.collection("users").doc(FirebaseAuth.instance.currentUser!.uid);
       var barcodeDocsUpToDate = await Future.wait(barcodes.map((e) async {
-          try {
-            var barcodeDoc = await transaction.get(FirebaseFirestore.instance
-                .collection("global_barcodes")
-                .doc(e.barcode));
-            var barcodeItem = GlobalBarcodeListItemModel.fromJson(barcodeDoc.data()!);
-            if (barcodeItem.companyReference == null) {
-              throw Exception("Barcode ${barcodeItem.barcode} isn't assigned to a company");
-            }
-            if (barcodeItem.sampleReference != null) {
-              throw Exception("Barcode ${barcodeItem.barcode} is assigned to a sample");
-            }
-            return barcodeItem;
-          } on FirebaseException catch (e) {
-            rethrow;
-          } catch (e) {
-              throw Exception("Barcode data malformed");
+        try {
+          var barcodeDoc =
+              await transaction.get(FirebaseFirestore.instance.collection("global_barcodes").doc(e.barcode));
+          var barcodeItem = GlobalBarcodeListItemModel.fromJson(barcodeDoc.data()!);
+          if (barcodeItem.companyReference == null) {
+            throw Exception("Barcode ${barcodeItem.barcode} isn't assigned to a company");
           }
+          if (barcodeItem.sampleReference != null) {
+            throw Exception("Barcode ${barcodeItem.barcode} is assigned to a sample");
+          }
+          return barcodeItem;
+        } on FirebaseException catch (e) {
+          rethrow;
+        } catch (e) {
+          throw Exception("Barcode data malformed");
+        }
       }));
       for (var barcode in barcodeDocsUpToDate) {
-        transaction.update(
-            FirebaseFirestore.instance
-                .collection('global_barcodes')
-                .doc(barcode.barcode),
-            {
-              "companyReference": FieldValue.delete(),
-              "dateAddedToCompany": FieldValue.delete(),
-              "companyName": FieldValue.delete(),
-              "reclaimedTimestamps": FieldValue.arrayUnion([
-                {"date": DateTime.now(), "userReference": userReference}
-              ])
-            });
+        transaction.update(FirebaseFirestore.instance.collection('global_barcodes').doc(barcode.barcode), {
+          "companyReference": FieldValue.delete(),
+          "dateAddedToCompany": FieldValue.delete(),
+          "companyName": FieldValue.delete(),
+          "reclaimedTimestamps": FieldValue.arrayUnion([
+            {"date": DateTime.now(), "userReference": userReference}
+          ])
+        });
       }
-      transaction.update(FirebaseFirestore.instance.collection("admin").doc("info"), {
-        "assignableBarcodes": FieldValue.arrayUnion(barcodeDocsUpToDate.map((e) => e.barcode).toList())
-      });
-      var barcodesGroupedByCompany = barcodeDocsUpToDate.groupSetsBy((globalBarcodeItem) => globalBarcodeItem.companyReference);
+      transaction.update(FirebaseFirestore.instance.collection("admin").doc("info"),
+          {"assignableBarcodes": FieldValue.arrayUnion(barcodeDocsUpToDate.map((e) => e.barcode).toList())});
+      var barcodesGroupedByCompany =
+          barcodeDocsUpToDate.groupSetsBy((globalBarcodeItem) => globalBarcodeItem.companyReference);
       for (var company in barcodesGroupedByCompany.keys) {
         transaction.update(FirebaseFirestore.instance.collection("companies").doc(company!.id), {
-          "barcodesPurchased": FieldValue.increment(barcodesGroupedByCompany[company]!.where((element) => element.wasPurchased == true).length * -1),
-          "barcodesAssigned": FieldValue.increment(barcodesGroupedByCompany[company]!.where((element) => element.wasPurchased == false).length * -1),
-          "assignableBarcodes": FieldValue.arrayRemove(barcodesGroupedByCompany[company]!.map((e) => e.barcode).toList())
+          "barcodesPurchased": FieldValue.increment(
+              barcodesGroupedByCompany[company]!.where((element) => element.wasPurchased == true).length * -1),
+          "barcodesAssigned": FieldValue.increment(
+              barcodesGroupedByCompany[company]!.where((element) => element.wasPurchased == false).length * -1),
+          "assignableBarcodes":
+              FieldValue.arrayRemove(barcodesGroupedByCompany[company]!.map((e) => e.barcode).toList())
         });
       }
     });
@@ -2248,8 +1973,7 @@ class BarcodeUploadResultInfo {
   final int duplicatedBarcodesCount;
   final int newBarcodesCount;
 
-  BarcodeUploadResultInfo(
-      {required this.duplicatedBarcodesCount, required this.newBarcodesCount});
+  BarcodeUploadResultInfo({required this.duplicatedBarcodesCount, required this.newBarcodesCount});
 }
 
 class UploadItemsResultInfo {

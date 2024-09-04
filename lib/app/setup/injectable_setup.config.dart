@@ -4,62 +4,61 @@
 // InjectableConfigGenerator
 // **************************************************************************
 
-// ignore_for_file: unnecessary_lambdas
-// ignore_for_file: lines_longer_than_80_chars
+// ignore_for_file: type=lint
 // coverage:ignore-file
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
-import 'package:agro_k/app/setup/injectable_setup.dart' as _i14;
-import 'package:agro_k/app/setup/min_version_bloc.dart' as _i8;
-import 'package:agro_k/app/setup/user_state.dart' as _i13;
-import 'package:agro_k/services/auth_service.dart' as _i3;
-import 'package:agro_k/services/location_service.dart' as _i6;
-import 'package:agro_k/services/members_service.dart' as _i7;
-import 'package:agro_k/services/payment_service.dart' as _i9;
-import 'package:agro_k/services/profile_service.dart' as _i10;
-import 'package:agro_k/services/sample_service.dart' as _i12;
-import 'package:agro_k/utilities/remote_error_logging_service.dart' as _i11;
-import 'package:get_it/get_it.dart' as _i1;
-import 'package:go_router/go_router.dart' as _i5;
-import 'package:injectable/injectable.dart' as _i2;
-import 'package:typesense/typesense.dart' as _i4;
+import 'package:agro_k/app/setup/injectable_setup.dart' as _i787;
+import 'package:agro_k/app/setup/min_version_bloc.dart' as _i1033;
+import 'package:agro_k/app/setup/user_state.dart' as _i284;
+import 'package:agro_k/services/auth_service.dart' as _i89;
+import 'package:agro_k/services/location_service.dart' as _i449;
+import 'package:agro_k/services/members_service.dart' as _i454;
+import 'package:agro_k/services/payment_service.dart' as _i937;
+import 'package:agro_k/services/profile_service.dart' as _i249;
+import 'package:agro_k/services/sample_service.dart' as _i281;
+import 'package:agro_k/utilities/remote_error_logging_service.dart' as _i491;
+import 'package:get_it/get_it.dart' as _i174;
+import 'package:go_router/go_router.dart' as _i583;
+import 'package:injectable/injectable.dart' as _i526;
+import 'package:typesense/typesense.dart' as _i47;
 
 const String _dev = 'dev';
 const String _prod = 'prod';
 
-extension GetItInjectableX on _i1.GetIt {
+extension GetItInjectableX on _i174.GetIt {
 // initializes the registration of main-scope dependencies inside of GetIt
-  _i1.GetIt init({
+  _i174.GetIt init({
     String? environment,
-    _i2.EnvironmentFilter? environmentFilter,
+    _i526.EnvironmentFilter? environmentFilter,
   }) {
-    final gh = _i2.GetItHelper(
+    final gh = _i526.GetItHelper(
       this,
       environment,
       environmentFilter,
     );
     final routeModule = _$RouteModule();
-    gh.factory<_i3.AuthService>(() => _i3.AuthService());
-    gh.singletonAsync<_i4.Client>(
+    gh.factory<_i1033.MinVersionBloc>(() => _i1033.MinVersionBloc());
+    gh.factory<_i449.LocationService>(() => _i449.LocationService());
+    gh.factory<_i281.SampleService>(() => _i281.SampleService());
+    gh.factory<_i249.ProfileService>(() => _i249.ProfileService());
+    gh.factory<_i454.MembersService>(() => _i454.MembersService());
+    gh.factory<_i89.AuthService>(() => _i89.AuthService());
+    gh.factory<_i937.PaymentService>(() => _i937.PaymentService());
+    gh.singleton<_i491.RemoteErrorLoggingService>(
+        () => routeModule.errorLoggingService);
+    gh.singleton<_i284.UserState>(() => _i284.UserState());
+    gh.lazySingleton<_i583.GoRouter>(() => routeModule.router());
+    gh.singletonAsync<_i47.Client>(
       () => routeModule.typesenseClientDev(),
       registerFor: {_dev},
     );
-    gh.singletonAsync<_i4.Client>(
+    gh.singletonAsync<_i47.Client>(
       () => routeModule.typesenseClientProd(),
       registerFor: {_prod},
     );
-    gh.lazySingleton<_i5.GoRouter>(() => routeModule.router());
-    gh.factory<_i6.LocationService>(() => _i6.LocationService());
-    gh.factory<_i7.MembersService>(() => _i7.MembersService());
-    gh.factory<_i8.MinVersionBloc>(() => _i8.MinVersionBloc());
-    gh.factory<_i9.PaymentService>(() => _i9.PaymentService());
-    gh.factory<_i10.ProfileService>(() => _i10.ProfileService());
-    gh.singleton<_i11.RemoteErrorLoggingService>(
-        routeModule.errorLoggingService);
-    gh.factory<_i12.SampleService>(() => _i12.SampleService());
-    gh.singleton<_i13.UserState>(_i13.UserState());
     return this;
   }
 }
 
-class _$RouteModule extends _i14.RouteModule {}
+class _$RouteModule extends _i787.RouteModule {}

@@ -3,8 +3,8 @@ import 'package:agro_k/app/setup/user_state.dart';
 import 'package:agro_k/components/add_new_barcode_widget.dart';
 import 'package:agro_k/components/assign_barcodes_widget.dart';
 import 'package:agro_k/components/clear_icon_widget.dart';
-import 'package:agro_k/models/crop_model.dart';
 import 'package:agro_k/models/company/company_model.dart';
+import 'package:agro_k/models/crop_model.dart';
 import 'package:agro_k/models/global_barcode_list_item_model.dart';
 import 'package:agro_k/models/user/user_model.dart';
 import 'package:agro_k/screens/CompanyTab/purchase_barcodes_screen.dart';
@@ -17,10 +17,10 @@ import 'package:agro_k/utilities/function_utils/navigation_utils.dart';
 import 'package:agro_k/utilities/function_utils/view_utils.dart';
 import 'package:agro_k/utilities/remote_error_logging_service.dart';
 import 'package:agro_k/utilities/sample_sorting.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:collection/collection.dart';
 import 'package:excel/excel.dart' hide Border;
 import 'package:file_picker/file_picker.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
@@ -29,8 +29,7 @@ class ManageBarcodesScreenArguments {
   final CompanyModel farm;
   final BarcodeSortFilterWrapper? initialSort;
 
-  const ManageBarcodesScreenArguments(
-      {Key? key, required this.farm, this.initialSort});
+  const ManageBarcodesScreenArguments({Key? key, required this.farm, this.initialSort});
 }
 
 class ManageBarcodesScreen extends StatefulWidget {
@@ -39,9 +38,7 @@ class ManageBarcodesScreen extends StatefulWidget {
   final CompanyModel? farm;
   final BarcodeSortFilterWrapper? initialSort;
 
-  const ManageBarcodesScreen(
-      {Key? key, required this.user, required this.farm, this.initialSort})
-      : super(key: key);
+  const ManageBarcodesScreen({Key? key, required this.user, required this.farm, this.initialSort}) : super(key: key);
 
   @override
   State<ManageBarcodesScreen> createState() => _ManageBarcodesScreenState();
@@ -133,9 +130,7 @@ class _ManageBarcodesScreenState extends State<ManageBarcodesScreen> {
                                   padding: const EdgeInsets.all(16.0),
                                   child: ElevatedButton(
                                       style: ButtonStyle(
-                                          backgroundColor:
-                                              MaterialStateProperty.all(
-                                                  AppColors.appPrimaryGreen)),
+                                          backgroundColor: MaterialStateProperty.all(AppColors.appPrimaryGreen)),
                                       onPressed: () {
                                         uploadAndProcessBarcodes();
                                       },
@@ -145,9 +140,7 @@ class _ManageBarcodesScreenState extends State<ManageBarcodesScreen> {
                                   padding: const EdgeInsets.all(16.0),
                                   child: ElevatedButton(
                                       style: ButtonStyle(
-                                          backgroundColor:
-                                              MaterialStateProperty.all(
-                                                  AppColors.appPrimaryGreen)),
+                                          backgroundColor: MaterialStateProperty.all(AppColors.appPrimaryGreen)),
                                       onPressed: () {
                                         addNewBarcode();
                                       },
@@ -157,9 +150,7 @@ class _ManageBarcodesScreenState extends State<ManageBarcodesScreen> {
                                   padding: const EdgeInsets.all(16.0),
                                   child: ElevatedButton(
                                       style: ButtonStyle(
-                                          backgroundColor:
-                                              MaterialStateProperty.all(
-                                                  AppColors.appPrimaryGreen)),
+                                          backgroundColor: MaterialStateProperty.all(AppColors.appPrimaryGreen)),
                                       onPressed: () {
                                         assignBarcodes();
                                       },
@@ -172,14 +163,9 @@ class _ManageBarcodesScreenState extends State<ManageBarcodesScreen> {
                                   padding: const EdgeInsets.all(16.0),
                                   child: ElevatedButton(
                                       style: ButtonStyle(
-                                          backgroundColor:
-                                              MaterialStateProperty.all(
-                                                  AppColors.appPrimaryGreen)),
+                                          backgroundColor: MaterialStateProperty.all(AppColors.appPrimaryGreen)),
                                       onPressed: () async {
-                                        bool result = await context.pushNamed<
-                                                    bool>(
-                                                PurchaseBarcodesScreen.id) ??
-                                            false;
+                                        bool result = await context.pushNamed<bool>(PurchaseBarcodesScreen.id) ?? false;
                                         if (result) {
                                           await getBarcodes();
                                         }
@@ -193,38 +179,28 @@ class _ManageBarcodesScreenState extends State<ManageBarcodesScreen> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(
-                                      "Barcodes assigned: ${widget.farm!.barcodesAssigned}",
-                                      style: const TextStyle(
-                                          fontWeight: FontWeight.w600)),
+                                  Text("Barcodes assigned: ${widget.farm!.barcodesAssigned}",
+                                      style: const TextStyle(fontWeight: FontWeight.w600)),
                                   const SizedBox(
                                     height: 16,
                                   ),
-                                  Text(
-                                      "Barcodes purchased: ${widget.farm!.barcodesPurchased}",
-                                      style: const TextStyle(
-                                          fontWeight: FontWeight.w600)),
+                                  Text("Barcodes purchased: ${widget.farm!.barcodesPurchased}",
+                                      style: const TextStyle(fontWeight: FontWeight.w600)),
                                 ],
                               ),
                             )
                           : Container(),
                       Card(
                           shape: const RoundedRectangleBorder(
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(4)),
-                              side: BorderSide(
-                                  color: AppColors.cardBorder, width: 1.0)),
-                          child: Padding(
-                              padding: const EdgeInsets.all(40.0),
-                              child: createCropTable(context)))
+                              borderRadius: BorderRadius.all(Radius.circular(4)),
+                              side: BorderSide(color: AppColors.cardBorder, width: 1.0)),
+                          child: Padding(padding: const EdgeInsets.all(40.0), child: createCropTable(context)))
                     ],
                   ),
                 ),
               ),
             ),
-            Visibility(
-                visible: isLoading,
-                child: const Center(child: CircularProgressIndicator()))
+            Visibility(visible: isLoading, child: const Center(child: CircularProgressIndicator()))
           ],
         ),
       ),
@@ -255,19 +231,14 @@ class _ManageBarcodesScreenState extends State<ManageBarcodesScreen> {
               alignment: Alignment.centerLeft,
               child: Text(
                 "BARCODE DASHBOARD",
-                style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 24,
-                    fontWeight: FontWeight.w700),
+                style: TextStyle(color: Colors.black, fontSize: 24, fontWeight: FontWeight.w700),
               ),
             ),
             const SizedBox(
               width: 15,
             ),
             ElevatedButton(
-                style: ButtonStyle(
-                    backgroundColor:
-                        MaterialStateProperty.all(AppColors.appPrimaryGreen)),
+                style: ButtonStyle(backgroundColor: MaterialStateProperty.all(AppColors.appPrimaryGreen)),
                 onPressed: () {
                   searchBarcodes();
                 },
@@ -276,9 +247,7 @@ class _ManageBarcodesScreenState extends State<ManageBarcodesScreen> {
               width: 15,
             ),
             ElevatedButton(
-                style: ButtonStyle(
-                    backgroundColor:
-                        MaterialStateProperty.all(AppColors.appPrimaryGreen)),
+                style: ButtonStyle(backgroundColor: MaterialStateProperty.all(AppColors.appPrimaryGreen)),
                 onPressed: () {
                   _searchBarcodeValue.text = "";
                   _searchBarcodeType.text = "";
@@ -292,15 +261,16 @@ class _ManageBarcodesScreenState extends State<ManageBarcodesScreen> {
               width: 35,
             ),
             ElevatedButton(
-                style: ButtonStyle(
-                    backgroundColor:
-                        MaterialStateProperty.all(AppColors.appPrimaryGreen)),
+                style: ButtonStyle(backgroundColor: MaterialStateProperty.all(AppColors.appPrimaryGreen)),
                 onPressed: () async {
                   try {
                     setState(() {
                       isLoading = true;
                     });
-                    await generateBarcodesExcelFile(barcodes);
+                    await generateBarcodesExcelFile(List.generate(
+                      barcodes.length,
+                      (index) => barcodes[index],
+                    ));
                   } catch (e) {
                     debugPrint(e.toString());
                   }
@@ -314,9 +284,7 @@ class _ManageBarcodesScreenState extends State<ManageBarcodesScreen> {
                 width: 35,
               ),
               ElevatedButton(
-                style: ButtonStyle(
-                    backgroundColor:
-                        MaterialStateProperty.all(AppColors.appPrimaryGreen)),
+                style: ButtonStyle(backgroundColor: MaterialStateProperty.all(AppColors.appPrimaryGreen)),
                 onPressed: () async {
                   if (barcodesCheckedToReclaim.length > 499) {
                     showOneButtonAlertDialog(
@@ -339,8 +307,7 @@ class _ManageBarcodesScreenState extends State<ManageBarcodesScreen> {
                         setState(() {
                           isLoading = true;
                         });
-                        await sampleService.reclaimBarcodes(
-                            barcodesCheckedToReclaim.keys.toList());
+                        await sampleService.reclaimBarcodes(barcodesCheckedToReclaim.keys.toList());
                         if (!mounted) return;
                         showOneButtonAlertDialog(
                           context,
@@ -372,8 +339,7 @@ class _ManageBarcodesScreenState extends State<ManageBarcodesScreen> {
                     "Are you sure you want to reclaim ${barcodesCheckedToReclaim.length} barcodes?",
                   );
                 },
-                child:
-                    Text("Reclaim ${barcodesCheckedToReclaim.length} samples"),
+                child: Text("Reclaim ${barcodesCheckedToReclaim.length} samples"),
               ),
               const SizedBox(
                 width: 8,
@@ -399,10 +365,7 @@ class _ManageBarcodesScreenState extends State<ManageBarcodesScreen> {
           children: [
             const Text(
               "Show",
-              style: TextStyle(
-                  color: AppColors.black1,
-                  fontSize: 14,
-                  fontWeight: FontWeight.w400),
+              style: TextStyle(color: AppColors.black1, fontSize: 14, fontWeight: FontWeight.w400),
             ),
             const SizedBox(
               width: 4,
@@ -423,10 +386,7 @@ class _ManageBarcodesScreenState extends State<ManageBarcodesScreen> {
                     iconSize: 20,
                     items: items,
                     focusColor: Colors.transparent,
-                    style: const TextStyle(
-                        color: AppColors.black1,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w400),
+                    style: const TextStyle(color: AppColors.black1, fontSize: 14, fontWeight: FontWeight.w400),
                     onChanged: (val) {
                       setState(() {
                         entriesSelected = val as int;
@@ -440,10 +400,7 @@ class _ManageBarcodesScreenState extends State<ManageBarcodesScreen> {
             ),
             const Text(
               "entries",
-              style: TextStyle(
-                  color: AppColors.black1,
-                  fontSize: 14,
-                  fontWeight: FontWeight.w400),
+              style: TextStyle(color: AppColors.black1, fontSize: 14, fontWeight: FontWeight.w400),
             ),
           ],
         ),
@@ -456,8 +413,7 @@ class _ManageBarcodesScreenState extends State<ManageBarcodesScreen> {
               controller: tableScrollController,
               scrollDirection: Axis.horizontal,
               child: Theme(
-                  data: Theme.of(context)
-                      .copyWith(dividerColor: AppColors.hintTextColor),
+                  data: Theme.of(context).copyWith(dividerColor: AppColors.hintTextColor),
                   child: Align(
                     alignment: Alignment.centerLeft,
                     child: DataTable(
@@ -471,9 +427,7 @@ class _ManageBarcodesScreenState extends State<ManageBarcodesScreen> {
                                   alignment: Alignment.centerLeft,
                                   child: Text(
                                     "Reclaim",
-                                    style: TextStyle(
-                                        color: Colors.black,
-                                        fontWeight: FontWeight.bold),
+                                    style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
                                     textAlign: TextAlign.center,
                                   ))),
                           DataColumn(
@@ -483,26 +437,19 @@ class _ManageBarcodesScreenState extends State<ManageBarcodesScreen> {
                                 children: [
                                   Align(
                                       alignment: Alignment.centerLeft,
-                                      child: createTitleRow("Barcode",
-                                          BarcodeSortFields.barcode)),
+                                      child: createTitleRow("Barcode", BarcodeSortFields.barcode)),
                                   Padding(
                                     padding: const EdgeInsets.only(top: 12.0),
                                     child: TextFormField(
                                       onFieldSubmitted: (_) => searchBarcodes(),
                                       decoration: InputDecoration(
                                           hintText: "Search Barcode",
-                                          hintStyle: const TextStyle(
-                                              color: AppColors.hintTextColor),
+                                          hintStyle: const TextStyle(color: AppColors.hintTextColor),
                                           border: const OutlineInputBorder(
-                                              borderSide: BorderSide(
-                                                  color:
-                                                      AppColors.hintTextColor)),
+                                              borderSide: BorderSide(color: AppColors.hintTextColor)),
                                           isDense: true,
-                                          contentPadding:
-                                              const EdgeInsets.symmetric(
-                                                  horizontal: 8, vertical: 8),
-                                          suffixIcon: ClearIcon(
-                                              _searchBarcodeValue, () {
+                                          contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                                          suffixIcon: ClearIcon(_searchBarcodeValue, () {
                                             searchBarcodes();
                                           })),
                                       controller: _searchBarcodeValue,
@@ -520,30 +467,19 @@ class _ManageBarcodesScreenState extends State<ManageBarcodesScreen> {
                                       children: [
                                         Align(
                                             alignment: Alignment.centerLeft,
-                                            child: createTitleRow("Company",
-                                                BarcodeSortFields.company)),
+                                            child: createTitleRow("Company", BarcodeSortFields.company)),
                                         Padding(
-                                          padding:
-                                              const EdgeInsets.only(top: 12.0),
+                                          padding: const EdgeInsets.only(top: 12.0),
                                           child: TextFormField(
-                                            onFieldSubmitted: (_) =>
-                                                searchBarcodes(),
+                                            onFieldSubmitted: (_) => searchBarcodes(),
                                             decoration: InputDecoration(
                                                 hintText: "Search Company",
-                                                hintStyle: const TextStyle(
-                                                    color: AppColors
-                                                        .hintTextColor),
+                                                hintStyle: const TextStyle(color: AppColors.hintTextColor),
                                                 border: const OutlineInputBorder(
-                                                    borderSide: BorderSide(
-                                                        color: AppColors
-                                                            .hintTextColor)),
+                                                    borderSide: BorderSide(color: AppColors.hintTextColor)),
                                                 isDense: true,
-                                                contentPadding:
-                                                    const EdgeInsets.symmetric(
-                                                        horizontal: 8,
-                                                        vertical: 8),
-                                                suffixIcon: ClearIcon(
-                                                    _searchCompany, () {
+                                                contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                                                suffixIcon: ClearIcon(_searchCompany, () {
                                                   searchBarcodes();
                                                 })),
                                             controller: _searchCompany,
@@ -561,64 +497,46 @@ class _ManageBarcodesScreenState extends State<ManageBarcodesScreen> {
                                 children: [
                                   Align(
                                       alignment: Alignment.centerLeft,
-                                      child: createTitleRow("Loaded date",
-                                          BarcodeSortFields.createdDate)),
+                                      child: createTitleRow("Loaded date", BarcodeSortFields.createdDate)),
                                   Padding(
                                     padding: const EdgeInsets.only(top: 12.0),
                                     child: TextFormField(
                                       onFieldSubmitted: (_) => searchBarcodes(),
                                       onTap: () async {
                                         DateTime currentDate = DateTime.now();
-                                        DateTimeRange? dateTimeRange =
-                                            await showDateRangePicker(
-                                                context: context,
-                                                initialEntryMode:
-                                                    DatePickerEntryMode
-                                                        .calendarOnly,
-                                                firstDate: currentDate.subtract(
-                                                    const Duration(days: 1000)),
-                                                lastDate: currentDate.add(
-                                                    const Duration(days: 1000)),
-                                                builder: (context, child) {
-                                                  return Column(
-                                                    children: [
-                                                      ConstrainedBox(
-                                                        constraints:
-                                                            const BoxConstraints(
-                                                                maxWidth: 400.0,
-                                                                maxHeight:
-                                                                    800.0),
-                                                        child: child,
-                                                      ),
-                                                    ],
-                                                  );
-                                                });
+                                        DateTimeRange? dateTimeRange = await showDateRangePicker(
+                                            context: context,
+                                            initialEntryMode: DatePickerEntryMode.calendarOnly,
+                                            firstDate: currentDate.subtract(const Duration(days: 1000)),
+                                            lastDate: currentDate.add(const Duration(days: 1000)),
+                                            builder: (context, child) {
+                                              return Column(
+                                                children: [
+                                                  ConstrainedBox(
+                                                    constraints:
+                                                        const BoxConstraints(maxWidth: 400.0, maxHeight: 800.0),
+                                                    child: child,
+                                                  ),
+                                                ],
+                                              );
+                                            });
                                         if (dateTimeRange != null) {
                                           _createdDateRange = dateTimeRange;
-                                          var startDate = DateFormat.yMd()
-                                              .format(_createdDateRange!.start);
-                                          var endDate = DateFormat.yMd()
-                                              .format(_createdDateRange!.end);
+                                          var startDate = DateFormat.yMd().format(_createdDateRange!.start);
+                                          var endDate = DateFormat.yMd().format(_createdDateRange!.end);
                                           if (_createdDateRange != null) {
-                                            _searchCreatedDate.text =
-                                                "$startDate-$endDate";
+                                            _searchCreatedDate.text = "$startDate-$endDate";
                                           }
                                         }
                                       },
                                       decoration: InputDecoration(
                                           hintText: 'Search loaded date',
-                                          hintStyle: const TextStyle(
-                                              color: AppColors.hintTextColor),
+                                          hintStyle: const TextStyle(color: AppColors.hintTextColor),
                                           border: const OutlineInputBorder(
-                                              borderSide: BorderSide(
-                                                  color:
-                                                      AppColors.hintTextColor)),
+                                              borderSide: BorderSide(color: AppColors.hintTextColor)),
                                           isDense: true,
-                                          contentPadding:
-                                              const EdgeInsets.symmetric(
-                                                  horizontal: 8, vertical: 8),
-                                          suffixIcon:
-                                              ClearIcon(_searchCreatedDate, () {
+                                          contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                                          suffixIcon: ClearIcon(_searchCreatedDate, () {
                                             _createdDateRange = null;
                                             searchBarcodes();
                                           })),
@@ -636,67 +554,47 @@ class _ManageBarcodesScreenState extends State<ManageBarcodesScreen> {
                                 children: [
                                   Align(
                                       alignment: Alignment.centerLeft,
-                                      child: createTitleRow(
-                                          "Added to company date",
-                                          BarcodeSortFields.addedToFarmDate)),
+                                      child:
+                                          createTitleRow("Added to company date", BarcodeSortFields.addedToFarmDate)),
                                   Padding(
                                     padding: const EdgeInsets.only(top: 12.0),
                                     child: TextFormField(
                                       onFieldSubmitted: (_) => searchBarcodes(),
                                       onTap: () async {
                                         DateTime currentDate = DateTime.now();
-                                        DateTimeRange? dateTimeRange =
-                                            await showDateRangePicker(
-                                                context: context,
-                                                initialEntryMode:
-                                                    DatePickerEntryMode
-                                                        .calendarOnly,
-                                                firstDate: currentDate.subtract(
-                                                    const Duration(days: 1000)),
-                                                lastDate: currentDate.add(
-                                                    const Duration(days: 1000)),
-                                                builder: (context, child) {
-                                                  return Column(
-                                                    children: [
-                                                      ConstrainedBox(
-                                                        constraints:
-                                                            const BoxConstraints(
-                                                                maxWidth: 400.0,
-                                                                maxHeight:
-                                                                    800.0),
-                                                        child: child,
-                                                      ),
-                                                    ],
-                                                  );
-                                                });
+                                        DateTimeRange? dateTimeRange = await showDateRangePicker(
+                                            context: context,
+                                            initialEntryMode: DatePickerEntryMode.calendarOnly,
+                                            firstDate: currentDate.subtract(const Duration(days: 1000)),
+                                            lastDate: currentDate.add(const Duration(days: 1000)),
+                                            builder: (context, child) {
+                                              return Column(
+                                                children: [
+                                                  ConstrainedBox(
+                                                    constraints:
+                                                        const BoxConstraints(maxWidth: 400.0, maxHeight: 800.0),
+                                                    child: child,
+                                                  ),
+                                                ],
+                                              );
+                                            });
                                         if (dateTimeRange != null) {
                                           _addedToFarmDateRange = dateTimeRange;
-                                          var startDate = DateFormat.yMd()
-                                              .format(
-                                                  _addedToFarmDateRange!.start);
-                                          var endDate = DateFormat.yMd().format(
-                                              _addedToFarmDateRange!.end);
+                                          var startDate = DateFormat.yMd().format(_addedToFarmDateRange!.start);
+                                          var endDate = DateFormat.yMd().format(_addedToFarmDateRange!.end);
                                           if (_addedToFarmDateRange != null) {
-                                            _searchAddedToFarmDate.text =
-                                                "$startDate-$endDate";
+                                            _searchAddedToFarmDate.text = "$startDate-$endDate";
                                           }
                                         }
                                       },
                                       decoration: InputDecoration(
-                                          hintText:
-                                              'Search added to company date',
-                                          hintStyle: const TextStyle(
-                                              color: AppColors.hintTextColor),
+                                          hintText: 'Search added to company date',
+                                          hintStyle: const TextStyle(color: AppColors.hintTextColor),
                                           border: const OutlineInputBorder(
-                                              borderSide: BorderSide(
-                                                  color:
-                                                      AppColors.hintTextColor)),
+                                              borderSide: BorderSide(color: AppColors.hintTextColor)),
                                           isDense: true,
-                                          contentPadding:
-                                              const EdgeInsets.symmetric(
-                                                  horizontal: 8, vertical: 8),
-                                          suffixIcon: ClearIcon(
-                                              _searchAddedToFarmDate, () {
+                                          contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                                          suffixIcon: ClearIcon(_searchAddedToFarmDate, () {
                                             _addedToFarmDateRange = null;
                                             searchBarcodes();
                                           })),
@@ -711,140 +609,119 @@ class _ManageBarcodesScreenState extends State<ManageBarcodesScreen> {
                             label: Expanded(
                               child: Align(
                                   alignment: Alignment.centerLeft,
-                                  child: createTitleRow(
-                                      "Sample", BarcodeSortFields.sample)),
+                                  child: createTitleRow("Sample", BarcodeSortFields.sample)),
+                            ),
+                          ),
+                          DataColumn(
+                            label: Expanded(
+                              child: Align(
+                                  alignment: Alignment.centerLeft,
+                                  child: createTitleRow("Shipping", BarcodeSortFields.shipping)),
                             ),
                           ),
                         ],
-                        rows: data
-                            .mapIndexed(
-                              (index, e) => DataRow.byIndex(
-                                  index: index,
-                                  color: MaterialStateColor.resolveWith(
-                                    (states) {
-                                      if (index % 2 == 0) {
-                                        return AppColors.tableRowBackground;
-                                      } else {
-                                        return Colors.white;
-                                      }
-                                    },
+                        rows: data.mapIndexed(
+                          (index, e) {
+                            return DataRow.byIndex(
+                                index: index,
+                                color: MaterialStateColor.resolveWith(
+                                  (states) {
+                                    if (index % 2 == 0) {
+                                      return AppColors.tableRowBackground;
+                                    } else {
+                                      return Colors.white;
+                                    }
+                                  },
+                                ),
+                                cells: [
+                                  DataCell(e.companyReference != null && e.sampleReference == null
+                                      ? Checkbox(
+                                          value: barcodesCheckedToReclaim[e] ?? false,
+                                          onChanged: (value) {
+                                            setState(() {
+                                              if (value ?? false) {
+                                                barcodesCheckedToReclaim[e] = true;
+                                              } else {
+                                                barcodesCheckedToReclaim.remove(e);
+                                              }
+                                            });
+                                          })
+                                      : Container()),
+                                  DataCell(
+                                    Align(
+                                      alignment: Alignment.centerLeft,
+                                      child: Text(e.barcode),
+                                    ),
                                   ),
-                                  cells: [
-                                    DataCell(e.companyReference != null &&
-                                            e.sampleReference == null
-                                        ? Checkbox(
-                                            value:
-                                                barcodesCheckedToReclaim[e] ??
-                                                    false,
-                                            onChanged: (value) {
-                                              setState(() {
-                                                if (value ?? false) {
-                                                  barcodesCheckedToReclaim[e] =
-                                                      true;
-                                                } else {
-                                                  barcodesCheckedToReclaim
-                                                      .remove(e);
-                                                }
-                                              });
-                                            })
-                                        : Container()),
-                                    DataCell(
-                                      Align(
-                                        alignment: Alignment.centerLeft,
-                                        child: Text(e.barcode),
+                                  widget.user.isSuperAdmin
+                                      ? DataCell(
+                                          Align(
+                                            alignment: Alignment.centerLeft,
+                                            child: TextButton(
+                                                onPressed: e.companyReference != null
+                                                    ? () {
+                                                        context.go(
+                                                          "${CompaniesManagementScreen.id}?highlightedCompanyId=${e.companyReference!.id}",
+                                                        );
+                                                      }
+                                                    : null,
+                                                child: Text(e.companyName ?? "-")),
+                                          ),
+                                        )
+                                      : DataCell(Container()),
+                                  DataCell(
+                                    Align(
+                                      alignment: Alignment.centerLeft,
+                                      child: Text(
+                                        e.createdDate != null ? DateFormat.yMd().format(e.createdDate!) : "N/A",
+                                        textAlign: TextAlign.left,
                                       ),
                                     ),
-                                    widget.user.isSuperAdmin
-                                        ? DataCell(
-                                            Align(
-                                              alignment: Alignment.centerLeft,
-                                              child: TextButton(
-                                                  onPressed:
-                                                      e.companyReference != null
-                                                          ? () {
-                                                              context.go(
-                                                                "${CompaniesManagementScreen.id}?highlightedCompanyId=${e.companyReference!.id}",
-                                                              );
-                                                            }
-                                                          : null,
-                                                  child: Text(
-                                                      e.companyName ?? "-")),
-                                            ),
-                                          )
-                                        : DataCell(Container()),
-                                    DataCell(
-                                      Align(
-                                        alignment: Alignment.centerLeft,
-                                        child: Text(
-                                          e.createdDate != null
-                                              ? DateFormat.yMd()
-                                                  .format(e.createdDate!)
-                                              : "N/A",
-                                          textAlign: TextAlign.left,
-                                        ),
+                                  ),
+                                  DataCell(
+                                    Align(
+                                      alignment: Alignment.centerLeft,
+                                      child: Text(
+                                        e.dateAddedToCompany != null
+                                            ? DateFormat.yMd().format(e.dateAddedToCompany!)
+                                            : "N/A",
+                                        textAlign: TextAlign.left,
                                       ),
                                     ),
-                                    DataCell(
-                                      Align(
-                                        alignment: Alignment.centerLeft,
-                                        child: Text(
-                                          e.dateAddedToCompany != null
-                                              ? DateFormat.yMd()
-                                                  .format(e.dateAddedToCompany!)
-                                              : "N/A",
-                                          textAlign: TextAlign.left,
-                                        ),
-                                      ),
-                                    ),
-                                    DataCell(
-                                      Align(
-                                        alignment: Alignment.centerLeft,
-                                        child: TextButton(
-                                            onPressed: e.companyReference !=
-                                                        null &&
-                                                    e.sampleReference != null
-                                                ? () async {
-                                                    try {
-                                                      var farmModel = CompanyModel
-                                                          .fromJson((await e
-                                                                      .companyReference!
-                                                                      .get())
-                                                                  .data()
-                                                              as Map<String,
-                                                                  dynamic>);
-                                                      if (!mounted) return;
-                                                      context.goNamed(
-                                                          SampleSubmittedScreen
-                                                              .id,
-                                                          extra: SampleSubmittedScreenArguments(
-                                                              uuid: e
-                                                                  .sampleReference!
-                                                                  .id,
-                                                              farm: farmModel,
-                                                              showNewLabelButton:
-                                                                  false));
-                                                    } catch (exception, stacktrace) {
-                                                      getIt
-                                                          .get<
-                                                              RemoteErrorLoggingService>()
-                                                          .recordError(
-                                                              exception,
-                                                              stacktrace);
-                                                      showOneButtonAlertDialog(
-                                                          context, "Ok", () {
-                                                        Navigator.pop(context);
-                                                      }, "Error",
-                                                          "There was an error loading the sample");
-                                                    }
+                                  ),
+                                  DataCell(
+                                    Align(
+                                      alignment: Alignment.centerLeft,
+                                      child: TextButton(
+                                          onPressed: e.companyReference != null && e.sampleReference != null
+                                              ? () async {
+                                                  try {
+                                                    var farmModel = CompanyModel.fromJson(
+                                                        (await e.companyReference!.get()).data()
+                                                            as Map<String, dynamic>);
+                                                    if (!mounted) return;
+                                                    context.goNamed(SampleSubmittedScreen.id,
+                                                        extra: SampleSubmittedScreenArguments(
+                                                            uuid: e.sampleReference!.id,
+                                                            farm: farmModel,
+                                                            showNewLabelButton: false));
+                                                  } catch (exception, stacktrace) {
+                                                    getIt
+                                                        .get<RemoteErrorLoggingService>()
+                                                        .recordError(exception, stacktrace);
+                                                    showOneButtonAlertDialog(context, "Ok", () {
+                                                      Navigator.pop(context);
+                                                    }, "Error", "There was an error loading the sample");
                                                   }
-                                                : null,
-                                            child: Text(
-                                                e.sampleReference?.id ?? "-")),
-                                      ),
+                                                }
+                                              : null,
+                                          child: Text(e.sampleReference?.id ?? "-")),
                                     ),
-                                  ]),
-                            )
-                            .toList()),
+                                  ),
+                                  DataCell(getShippingWidget(e)),
+                                ]);
+                          },
+                        ).toList()),
                   )),
             ),
           ),
@@ -859,10 +736,7 @@ class _ManageBarcodesScreenState extends State<ManageBarcodesScreen> {
             ),
             Text(
               "Showing ${topListNum + 1} to $endListNum of $totalEntries entries",
-              style: const TextStyle(
-                  color: AppColors.grayTextColor,
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600),
+              style: const TextStyle(color: AppColors.grayTextColor, fontSize: 14, fontWeight: FontWeight.w600),
             ),
             const Expanded(child: SizedBox()),
             Container(
@@ -871,9 +745,7 @@ class _ManageBarcodesScreenState extends State<ManageBarcodesScreen> {
                   width: 1,
                   color: AppColors.cardBorder,
                 ),
-                borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(5),
-                    bottomLeft: Radius.circular(5)),
+                borderRadius: const BorderRadius.only(topLeft: Radius.circular(5), bottomLeft: Radius.circular(5)),
               ),
               child: TextButton(
                 onPressed: dashboardPageNum > 1
@@ -885,8 +757,7 @@ class _ManageBarcodesScreenState extends State<ManageBarcodesScreen> {
                     : null,
                 child: const Text(
                   "Previous",
-                  style: TextStyle(
-                      color: Colors.grey, fontWeight: FontWeight.w400),
+                  style: TextStyle(color: Colors.grey, fontWeight: FontWeight.w400),
                 ),
               ),
             ),
@@ -909,9 +780,7 @@ class _ManageBarcodesScreenState extends State<ManageBarcodesScreen> {
             Container(
               decoration: BoxDecoration(
                 border: Border.all(width: 1, color: AppColors.cardBorder),
-                borderRadius: const BorderRadius.only(
-                    topRight: Radius.circular(5),
-                    bottomRight: Radius.circular(5)),
+                borderRadius: const BorderRadius.only(topRight: Radius.circular(5), bottomRight: Radius.circular(5)),
               ),
               child: TextButton(
                 onPressed: dashboardPageNum * entriesSelected < barcodes.length
@@ -923,8 +792,7 @@ class _ManageBarcodesScreenState extends State<ManageBarcodesScreen> {
                     : null,
                 child: const Text(
                   "Next",
-                  style: TextStyle(
-                      color: Colors.grey, fontWeight: FontWeight.w400),
+                  style: TextStyle(color: Colors.grey, fontWeight: FontWeight.w400),
                 ),
               ),
             ),
@@ -942,14 +810,8 @@ class _ManageBarcodesScreenState extends State<ManageBarcodesScreen> {
       setState(() {
         isLoading = true;
       });
-      barcodes = await sampleService.searchBarcodes(
-          _createdDateRange,
-          _addedToFarmDateRange,
-          _searchBarcodeValue.text,
-          _searchBarcodeType.text,
-          _searchCompany.text,
-          sortFilter,
-          widget.farm);
+      barcodes = await sampleService.searchBarcodes(_createdDateRange, _addedToFarmDateRange, _searchBarcodeValue.text,
+          _searchBarcodeType.text, _searchCompany.text, sortFilter, widget.farm);
       setState(() {
         barcodes;
       });
@@ -983,8 +845,7 @@ class _ManageBarcodesScreenState extends State<ManageBarcodesScreen> {
         children: [
           Text(
             title,
-            style: const TextStyle(
-                color: Colors.black, fontWeight: FontWeight.bold),
+            style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
             textAlign: TextAlign.center,
           ),
           InkWell(
@@ -1001,8 +862,7 @@ class _ManageBarcodesScreenState extends State<ManageBarcodesScreen> {
       width: 200,
       child: Text(
         title,
-        style:
-            const TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+        style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
         textAlign: TextAlign.left,
       ),
     );
@@ -1062,9 +922,7 @@ class _ManageBarcodesScreenState extends State<ManageBarcodesScreen> {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             const Text("Enter new barcode name",
-                                style: TextStyle(
-                                    color: Colors.black,
-                                    fontWeight: FontWeight.bold)),
+                                style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
                             Padding(
                               padding: const EdgeInsets.only(top: 30.0),
                               child: TextFormField(
@@ -1083,13 +941,11 @@ class _ManageBarcodesScreenState extends State<ManageBarcodesScreen> {
                               padding: const EdgeInsets.only(top: 30.0),
                               child: TextButton(
                                 onPressed: () {
-                                  if (formKey.currentState != null &&
-                                      formKey.currentState!.validate()) {
+                                  if (formKey.currentState != null && formKey.currentState!.validate()) {
                                     setState(() {
                                       barcode.name = controller.text;
                                     });
-                                    sampleService.editCrop(barcode.id,
-                                        barcode.name, barcode.isActive);
+                                    sampleService.editCrop(barcode.id, barcode.name, barcode.isActive);
                                     Navigator.pop(context);
                                   }
                                 },
@@ -1155,14 +1011,13 @@ class _ManageBarcodesScreenState extends State<ManageBarcodesScreen> {
               .map((row) {
                 if (row.isNotEmpty) {
                   String? barcode;
-                  if (row[0]!.value is SharedString ||
-                      row[0]!.value is String) {
+                  if (row[0]!.value is SharedString || row[0]!.value is String) {
                     barcode = row[0]!.value.toString().trim();
                   }
                   var barcodeRegex = RegExp("[A-Z]{3}[0-9]{4}");
                   if (barcode != null && barcodeRegex.hasMatch(barcode)) {
-                    return GlobalBarcodeListItemModel(row[0]!.value.toString(),
-                        null, null, null, currentDate, null, null, []);
+                    return GlobalBarcodeListItemModel(
+                        row[0]!.value.toString(), null, null, null, currentDate, null, null, [], false);
                   } else {
                     invalidBarcodesCount++;
                     return null;
@@ -1197,5 +1052,15 @@ class _ManageBarcodesScreenState extends State<ManageBarcodesScreen> {
         isLoading = false;
       });
     }
+  }
+
+  Widget getShippingWidget(GlobalBarcodeListItemModel item) {
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: Text(
+        item.shipping == true ? 'Yes' : 'No',
+        textAlign: TextAlign.left,
+      ),
+    );
   }
 }

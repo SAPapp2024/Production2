@@ -16,11 +16,12 @@ GlobalBarcodeListItemModel _$GlobalBarcodeListItemModelFromJson(
       const DocumentSerializerNullable()
           .fromJson(json['sampleReference'] as DocumentReference<Object?>?),
       GlobalBarcodeListItemModel.dateTimeFromTimestampNullable(
-          json['createdDate'] as Timestamp?),
+          json['createdDate']),
       GlobalBarcodeListItemModel.dateTimeFromTimestampNullable(
-          json['dateAddedToCompany'] as Timestamp?),
+          json['dateAddedToCompany']),
       json['wasPurchased'] as bool?,
       json['reclaimedTimestamps'] as List<dynamic>,
+      json['shipping'] as bool?,
     );
 
 Map<String, dynamic> _$GlobalBarcodeListItemModelToJson(
@@ -38,4 +39,5 @@ Map<String, dynamic> _$GlobalBarcodeListItemModelToJson(
       'dateAddedToCompany': GlobalBarcodeListItemModel.firestoreTimestampToJson(
           instance.dateAddedToCompany),
       'reclaimedTimestamps': instance.reclaimedTimestamps,
+      'shipping': instance.shipping,
     };

@@ -11,10 +11,12 @@ class PurchasingWebViewArguments {
   final bool isAdmin;
   final String? cardToken;
   final bool saveCard;
+  final bool shipping;
 
   PurchasingWebViewArguments(
       {required this.address,
       required this.zipcode,
       required this.amount,
+        required this.shipping,
       required this.email, required this.companyId, required this.isAdmin, required this.cardToken, required this.saveCard});
 }

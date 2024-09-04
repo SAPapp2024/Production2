@@ -1,6 +1,7 @@
 import 'package:agro_k/app/app.dart';
 import 'package:agro_k/app/setup/injectable_setup.dart';
 import 'package:agro_k/app/setup/user_state.dart';
+import 'package:agro_k/components/purchasing_web_view_imports.dart';
 import 'package:agro_k/models/company/company_model.dart';
 import 'package:agro_k/models/company/sample_with_user_model.dart';
 import 'package:agro_k/models/user/user_model.dart';
@@ -32,14 +33,12 @@ import 'package:agro_k/screens/edit_company_profile_screen.dart';
 import 'package:agro_k/screens/edit_user_password_screen.dart';
 import 'package:agro_k/screens/edit_user_profile_screen.dart';
 import 'package:agro_k/screens/no_permissions_screen.dart';
-import 'package:agro_k/screens/page_not_found_screen.dart';
 import 'package:agro_k/utilities/sample_sorting.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:universal_html/html.dart' as html;
-import 'package:agro_k/components/purchasing_web_view_imports.dart';
 
 bool isCustomAuthActionUri(Uri? uri) {
   if (uri != null && uri.pathSegments.contains('auth')) {
@@ -112,8 +111,7 @@ GoRouter getRouter() {
               return SeeCompanyUsersScreen(user: extra.user, farm: extra.farm);
             },
             redirect: (BuildContext context, GoRouterState state) {
-              if (state.extra == null ||
-                  state.extra! is! SeeCompanyUsersScreenArguments) {
+              if (state.extra == null || state.extra! is! SeeCompanyUsersScreenArguments) {
                 return DashboardScreen.id;
               }
               return null;
@@ -132,8 +130,7 @@ GoRouter getRouter() {
               );
             },
             redirect: (BuildContext context, GoRouterState state) {
-              if (state.extra == null ||
-                  state.extra! is! SampleSubmittedScreenArguments) {
+              if (state.extra == null || state.extra! is! SampleSubmittedScreenArguments) {
                 return DashboardScreen.id;
               }
               return null;
@@ -143,8 +140,7 @@ GoRouter getRouter() {
             path: CompanySamplesScreen.id,
             builder: (BuildContext context, GoRouterState state) {
               UserState userState = getIt.get();
-              UserWithCompaniesModel userWithCompaniesModel =
-                  userState.userData!;
+              UserWithCompaniesModel userWithCompaniesModel = userState.userData!;
               CompanyModel currentCompany = userState.currentCompanyData!;
               return CompanySamplesScreen(
                 user: userWithCompaniesModel.user,
@@ -200,8 +196,7 @@ GoRouter getRouter() {
             path: PurchaseBarcodesScreen.id,
             builder: (BuildContext context, GoRouterState state) {
               UserState userState = getIt.get();
-              UserWithCompaniesModel userWithCompaniesModel =
-                  userState.userData!;
+              UserWithCompaniesModel userWithCompaniesModel = userState.userData!;
               CompanyModel currentCompany = userState.currentCompanyData!;
               return PurchaseBarcodesScreen(
                 user: userWithCompaniesModel.user,
@@ -210,13 +205,6 @@ GoRouter getRouter() {
             },
             redirect: (context, state) {
               return null;
-              UserState userState = getIt.get();
-              CompanyModel? currentCompany = userState.currentCompanyData;
-              if (currentCompany == null ||
-                  !(userState.isCompanyAdmin())) {
-                return DashboardScreen.id;
-              }
-              return null;
             }),
         GoRoute(
             name: PurchasingWebView.id,
@@ -224,7 +212,7 @@ GoRouter getRouter() {
             builder: (BuildContext context, GoRouterState state) {
               //know if device is android or ios
               final extra = state.extra as PurchasingWebViewArguments;
-                return PurchasingWebView(
+              return PurchasingWebView(
                   address: extra.address,
                   zipcode: extra.zipcode,
                   amount: extra.amount,
@@ -233,27 +221,10 @@ GoRouter getRouter() {
                   isAdmin: extra.isAdmin,
                   cardToken: extra.cardToken,
                   saveCard: extra.saveCard,
-                );
+                  shipping: extra.shipping);
             },
             redirect: (context, state) {
               return null;
-              if (!kIsWeb) {
-                return DashboardScreen.id;
-              }
-              if (defaultTargetPlatform == TargetPlatform.iOS || defaultTargetPlatform == TargetPlatform.android) {
-                if (state.uri.queryParameters["token"] != null) {
-                  return null;
-                } else {
-                  return DashboardScreen.id;
-                }
-              } else {
-                //coming from purchase barcodes screen
-                if (state.extra is PurchasingWebViewArguments) {
-                  return null;
-                } else {
-                  return DashboardScreen.id;
-                }
-              }
             }),
         GoRoute(
           name: ManageCropsScreen.id,
@@ -278,8 +249,7 @@ GoRouter getRouter() {
             bool isSuperAdmin = userData?.isSuperAdmin ?? false;
             if (isSuperAdmin) {
               return ManageUsersScreen(
-                highlightedUserId:
-                    state.uri.queryParameters["highlightedUserId"],
+                highlightedUserId: state.uri.queryParameters["highlightedUserId"],
               );
             } else {
               return const NoPermissionsScreen();
@@ -297,8 +267,7 @@ GoRouter getRouter() {
             CompanyModel? farmSelectedBySuperAdmin;
             BarcodeSortFilterWrapper? initialSort;
             if (state.extra is ManageBarcodesScreenArguments) {
-              ManageBarcodesScreenArguments arguments =
-                  state.extra as ManageBarcodesScreenArguments;
+              ManageBarcodesScreenArguments arguments = state.extra as ManageBarcodesScreenArguments;
               farmSelectedBySuperAdmin = arguments.farm;
               initialSort = arguments.initialSort;
             }
@@ -322,8 +291,7 @@ GoRouter getRouter() {
               CompanyModel? currentCompany = userState.currentCompanyData;
               CompanyModel? farmSelectedBySuperAdmin;
               if (state.extra is ManageGrowersScreenArguments) {
-                farmSelectedBySuperAdmin =
-                    (state.extra as ManageGrowersScreenArguments).farm;
+                farmSelectedBySuperAdmin = (state.extra as ManageGrowersScreenArguments).farm;
               }
               if (currentCompany != null || farmSelectedBySuperAdmin != null) {
                 return ManageGrowersScreen(
@@ -337,9 +305,7 @@ GoRouter getRouter() {
             redirect: (BuildContext context, GoRouterState state) {
               UserState userState = getIt.get();
               CompanyModel? currentCompany = userState.currentCompanyData;
-              if (currentCompany == null &&
-                  (state.extra == null ||
-                      state.extra! is! ManageGrowersScreenArguments)) {
+              if (currentCompany == null && (state.extra == null || state.extra! is! ManageGrowersScreenArguments)) {
                 return DashboardScreen.id;
               }
               return null;
@@ -354,8 +320,7 @@ GoRouter getRouter() {
               );
             },
             redirect: (BuildContext context, GoRouterState state) {
-              if (state.extra == null ||
-                  state.extra! is! SeeSampleChangesScreenArguments) {
+              if (state.extra == null || state.extra! is! SeeSampleChangesScreenArguments) {
                 return DashboardScreen.id;
               }
               return null;
@@ -370,8 +335,7 @@ GoRouter getRouter() {
               );
             },
             redirect: (BuildContext context, GoRouterState state) {
-              if (state.extra == null ||
-                  state.extra! is! SeeCompanyChangesScreenArguments) {
+              if (state.extra == null || state.extra! is! SeeCompanyChangesScreenArguments) {
                 return DashboardScreen.id;
               }
               return null;
@@ -386,8 +350,7 @@ GoRouter getRouter() {
               );
             },
             redirect: (BuildContext context, GoRouterState state) {
-              if (state.extra == null ||
-                  state.extra! is! SeeUserChangesScreenArguments) {
+              if (state.extra == null || state.extra! is! SeeUserChangesScreenArguments) {
                 return DashboardScreen.id;
               }
               return null;
@@ -402,8 +365,7 @@ GoRouter getRouter() {
               );
             },
             redirect: (BuildContext context, GoRouterState state) {
-              if (state.extra == null ||
-                  state.extra! is! ConfirmAccountScreenArguments) {
+              if (state.extra == null || state.extra! is! ConfirmAccountScreenArguments) {
                 debugPrint("Redirecting to dashboard");
                 return DashboardScreen.id;
               }
@@ -433,8 +395,7 @@ GoRouter getRouter() {
               );
             },
             redirect: (BuildContext context, GoRouterState state) {
-              if (state.extra == null ||
-                  state.extra! is! CreateCompanyScreenArguments) {
+              if (state.extra == null || state.extra! is! CreateCompanyScreenArguments) {
                 return DashboardScreen.id;
               }
               return null;
@@ -450,8 +411,7 @@ GoRouter getRouter() {
               );
             },
             redirect: (BuildContext context, GoRouterState state) {
-              if (state.extra == null ||
-                  state.extra! is! SeeReportScreenArguments) {
+              if (state.extra == null || state.extra! is! SeeReportScreenArguments) {
                 return DashboardScreen.id;
               }
               return null;
@@ -462,10 +422,8 @@ GoRouter getRouter() {
             builder: (BuildContext context, GoRouterState state) {
               var extra = state.extra as Map<String, dynamic>?;
               UserState userState = getIt.get();
-              UserWithCompaniesModel userWithCompaniesModel =
-                  userState.userData!;
-              SampleWithUserModel? existingSampleToEdit =
-                  extra?["existingSampleToEdit"];
+              UserWithCompaniesModel userWithCompaniesModel = userState.userData!;
+              SampleWithUserModel? existingSampleToEdit = extra?["existingSampleToEdit"];
               CompanyModel? sampleCompany = extra?["sampleCompany"];
               CompanyModel? currentCompany = userState.currentCompanyData;
               bool populateFields = extra?["populateFields"] ?? true;
@@ -487,13 +445,10 @@ GoRouter getRouter() {
               var extra = state.extra as Map<String, dynamic>?;
               UserState userState = getIt.get();
               CompanyModel? currentCompany = userState.currentCompanyData;
-              SampleWithUserModel? existingSampleToEdit =
-                  extra?["existingSampleToEdit"];
+              SampleWithUserModel? existingSampleToEdit = extra?["existingSampleToEdit"];
               CompanyModel? sampleCompany = extra?["sampleCompany"];
-              debugPrint(
-                  "existingSampleToEdit = $existingSampleToEdit // sampleCompany = $sampleCompany // $extra");
-              if (currentCompany == null &&
-                  (existingSampleToEdit == null || sampleCompany == null)) {
+              debugPrint("existingSampleToEdit = $existingSampleToEdit // sampleCompany = $sampleCompany // $extra");
+              if (currentCompany == null && (existingSampleToEdit == null || sampleCompany == null)) {
                 return DashboardScreen.id;
               }
               return null;
@@ -507,8 +462,7 @@ GoRouter getRouter() {
             bool isSuperAdmin = userData?.isSuperAdmin ?? false;
             if (isSuperAdmin) {
               return CompaniesManagementScreen(
-                highlightedCompanyId:
-                    state.uri.queryParameters["highlightedCompanyId"],
+                highlightedCompanyId: state.uri.queryParameters["highlightedCompanyId"],
               );
             } else {
               return const NoPermissionsScreen();
@@ -530,11 +484,7 @@ GoRouter getRouter() {
         UserState userState = getIt.get();
         User? user = userState.user;
         bool isUserVerified = user?.emailVerified ?? false;
-        List<String> routesNotNeedAuthentication = [
-          LogInScreen.id,
-          SignUpScreen.id,
-          ResetPasswordScreen.id
-        ];
+        List<String> routesNotNeedAuthentication = [LogInScreen.id, SignUpScreen.id, ResetPasswordScreen.id];
         if (state.matchedLocation == PurchasingWebView.id) {
           return null;
         }
@@ -554,24 +504,18 @@ GoRouter getRouter() {
           }
         }
         if (kIsWeb &&
-            ![
-              ...routesNotNeedAuthentication,
-              ConfirmAccountScreen.id,
-              CustomAuthActionScreen.id
-            ].contains(state.matchedLocation) &&
+            ![...routesNotNeedAuthentication, ConfirmAccountScreen.id, CustomAuthActionScreen.id]
+                .contains(state.matchedLocation) &&
             user != null) {
-          String userAgent =
-              html.window.navigator.userAgent.toString().toLowerCase();
+          String userAgent = html.window.navigator.userAgent.toString().toLowerCase();
           if (userAgent.contains("android") || userAgent.contains("iphone")) {
             return UseDesktopOrAppScreen.id;
           }
         }
-        if (!routesNotNeedAuthentication.contains(state.matchedLocation) &&
-            user == null) {
+        if (!routesNotNeedAuthentication.contains(state.matchedLocation) && user == null) {
           return LogInScreen.id;
         }
-        if (isUserVerified &&
-            routesNotNeedAuthentication.contains(state.matchedLocation)) {
+        if (isUserVerified && routesNotNeedAuthentication.contains(state.matchedLocation)) {
           return DashboardScreen.id;
         }
         if (isUserVerified && state.matchedLocation == "/") {

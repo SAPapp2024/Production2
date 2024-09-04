@@ -506,35 +506,58 @@ export const deleteExpiredReservedBarcodes = functions.pubsub
     );
   });
 
-function calculateTotalPrice(quantity: number) {
-  let pricePerItem;
+function calculateTotalPrice(quantity: number, shipping: boolean): string {
+  let pricePerItem: number;
 
-  if (quantity >= 0 && quantity < 10) {
-    pricePerItem = 40.0;
-  } else if (quantity >= 10 && quantity < 20) {
-    pricePerItem = 37.5;
-  } else if (quantity >= 20 && quantity < 50) {
-    pricePerItem = 35.0;
-  } else if (quantity >= 50 && quantity < 100) {
-    pricePerItem = 32.5;
-  } else if (quantity >= 100 && quantity < 250) {
-    pricePerItem = 30.0;
-  } else if (quantity >= 250 && quantity < 1000) {
-    pricePerItem = 27.5;
-  } else if (quantity >= 1000) {
-    pricePerItem = 25.0;
+  if (shipping) {
+    // Higher shipping charges
+    if (quantity >= 0 && quantity < 10) {
+      pricePerItem = 52.5;
+    } else if (quantity >= 10 && quantity < 20) {
+      pricePerItem = 45.0;
+    } else if (quantity >= 20 && quantity < 50) {
+      pricePerItem = 40.0;
+    } else if (quantity >= 50 && quantity < 100) {
+      pricePerItem = 37.5;
+    } else if (quantity >= 100 && quantity < 250) {
+      pricePerItem = 35.0;
+    } else if (quantity >= 250 && quantity < 1000) {
+      pricePerItem = 32.5;
+    } else if (quantity >= 1000) {
+      pricePerItem = 30.0;
+    } else {
+      return '0.00';
+    }
   } else {
-    return 0;
+    // Lower shipping charges
+    if (quantity >= 0 && quantity < 10) {
+      pricePerItem = 40.0;
+    } else if (quantity >= 10 && quantity < 20) {
+      pricePerItem = 37.5;
+    } else if (quantity >= 20 && quantity < 50) {
+      pricePerItem = 35.0;
+    } else if (quantity >= 50 && quantity < 100) {
+      pricePerItem = 32.5;
+    } else if (quantity >= 100 && quantity < 250) {
+      pricePerItem = 30.0;
+    } else if (quantity >= 250 && quantity < 1000) {
+      pricePerItem = 27.5;
+    } else if (quantity >= 1000) {
+      pricePerItem = 25.0;
+    } else {
+      return '0.00';
+    }
   }
 
-  var numberRes = quantity * pricePerItem;
-  return numberRes.toFixed(2).toString();
+  const totalPrice = quantity * pricePerItem;
+  return totalPrice.toFixed(2);
 }
 
-const merchantID = "0029870"; // Converge Account ID
-const merchantUserID = "apiuser872443"; // Converge User ID
+
+const merchantID = "623370"; // Converge Account ID
+const merchantUserID = "apiuser842932"; // Converge User ID
 const merchantPinCode =
-  "XBI1FL04HZ5JDCQVLRM4VPDHJQ3I84JJS3PFJE9RT2ZI0Q1RD1CBGL5H1LKNQJNA"; // Converge PIN
+  "PJRKCV7V7LH9JPAT80VXAVYOI00KRQLDS1UTUOZ3828Z49WEVTARAN57KS53LT9Z"; // Converge PIN
 
 export const payWithToken = functions.https.onRequest(async (req, res) => {
   cors(req, res, () => {
@@ -542,7 +565,8 @@ export const payWithToken = functions.https.onRequest(async (req, res) => {
     const token = req.body.token;
     const amount = req.body.amount;
     const companyId = req.body.companyId;
-    const price = calculateTotalPrice(Number(amount));
+    const shipping = req.body.shipping === 'true';
+    const price = calculateTotalPrice(Number(amount), shipping);
     const invoiceNumber = `${Date.now()}${(
       Math.floor(Math.random() * 10000) + 1
     ).toString()}`;
@@ -608,7 +632,8 @@ export const getConvergePayToken = functions.https.onRequest(
         const url =
           "https://api.demo.convergepay.com/hosted-payments/transaction_token"; // Converge URL
         const amount = req.body.amount;
-        const price = calculateTotalPrice(Number(amount));
+        const shipping = req.body.shipping === 'true';
+        const price = calculateTotalPrice(Number(amount), shipping);
         const address = req.body.address;
         const zip = req.body.zip;
         const email = req.body.email;
@@ -672,7 +697,7 @@ export const getConvergePayToken = functions.https.onRequest(
         // Set up POST request data
         console.log("debug label 1");
         const postData = {
-          ssl_merchant_id: merchantID,
+          ssl_account_id: merchantID,
           ssl_user_id: merchantUserID,
           ssl_pin: merchantPinCode,
           ssl_transaction_type: "CCSALE",

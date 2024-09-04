@@ -11,8 +11,8 @@ AdminInfoModel _$AdminInfoModelFromJson(Map<String, dynamic> json) =>
       assignableBarcodes: (json['assignableBarcodes'] as List<dynamic>)
           .map((e) => e as String)
           .toList(),
-      assignedBarcodesAmount: json['assignedBarcodesAmount'] as int,
-      usedBarcodesAmount: json['usedBarcodesAmount'] as int,
+      assignedBarcodesAmount: (json['assignedBarcodesAmount'] as num).toInt(),
+      usedBarcodesAmount: (json['usedBarcodesAmount'] as num).toInt(),
       crops: (json['crops'] as List<dynamic>)
           .map((e) => CropModel.fromJson(e as Map<String, dynamic>))
           .toList(),

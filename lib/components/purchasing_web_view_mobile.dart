@@ -16,6 +16,7 @@ class PurchasingWebView extends StatefulWidget {
   final bool isAdmin;
   final String? cardToken;
   final bool saveCard;
+  final bool shipping;
 
   const PurchasingWebView(
       {super.key,
@@ -25,8 +26,10 @@ class PurchasingWebView extends StatefulWidget {
       this.email,
       this.token,
       required this.companyId,
+      required this.shipping,
       required this.isAdmin,
-      required this.cardToken, required this.saveCard});
+      required this.cardToken,
+      required this.saveCard});
 
   @override
   State<PurchasingWebView> createState() => _PurchasingWebViewState();
@@ -42,11 +45,12 @@ class _PurchasingWebViewState extends State<PurchasingWebView> {
       'zipcode': widget.zipcode,
       'amount': widget.amount,
       'email': widget.email,
+      'shipping': widget.shipping,
     });
     final paymentUrl = getPaymentUrl(RepositoryProvider.of<Environment>(context, listen: false));
     launchUrl(
         Uri.parse(
-            "$paymentUrl?company_id=${widget.companyId}&from_mobile_app=1&amount=${widget.amount}&address=${widget.address}&zip=${widget.zipcode}&email=${widget.email}"),
+            "$paymentUrl?company_id=${widget.companyId}&from_mobile_app=1&amount=${widget.amount}&shipping=${widget.shipping}&address=${widget.address}&zip=${widget.zipcode}&email=${widget.email}"),
         mode: LaunchMode.externalNonBrowserApplication);
     super.initState();
   }

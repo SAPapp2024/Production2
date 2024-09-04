@@ -22,7 +22,8 @@ enum BarcodeSortFields {
   createdDate,
   addedToFarmDate,
   none,
-  sample
+  sample,
+  shipping
 }
 
 enum UserSortFields { firstName, lastName, email, phone, farmName, none }

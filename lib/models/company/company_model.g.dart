@@ -48,9 +48,9 @@ CompanyModel _$CompanyModelFromJson(Map<String, dynamic> json) => CompanyModel(
       assignableBarcodes: (json['assignableBarcodes'] as List<dynamic>)
           .map((e) => e as String)
           .toList(),
-      barcodesPurchased: json['barcodesPurchased'] as int,
-      barcodesAssigned: json['barcodesAssigned'] as int,
-      usedBarcodesCount: json['usedBarcodesCount'] as int? ?? 0,
+      barcodesPurchased: (json['barcodesPurchased'] as num).toInt(),
+      barcodesAssigned: (json['barcodesAssigned'] as num).toInt(),
+      usedBarcodesCount: (json['usedBarcodesCount'] as num?)?.toInt() ?? 0,
       companyAdminUserInfo: json['companyAdminUserInfo'] == null
           ? null
           : CompanyAdminUserInfo.fromJson(

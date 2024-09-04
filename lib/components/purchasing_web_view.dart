@@ -5,7 +5,7 @@ import 'package:flutter/foundation.dart';
 enum PaymentStatus { approved, error, canceled, declined, unknown }
 
 String getPaymentUrl(Environment environment) {
-  return "${environment == Environment.qa ? 'https://ttorbik.github.io' : 'https://www.agro-k.com/elavon'}/payment_process_container.html";
+  return "${environment == Environment.qa ? 'https://SAPapp2024.github.io/agrok' : 'https://www.agro-k.com/elavon'}/payment_process_container.html";
 }
 
 PaymentStatus typeToPaymentStatus(String type) {

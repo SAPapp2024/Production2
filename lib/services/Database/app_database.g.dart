@@ -113,9 +113,10 @@ class $DBSampleModelTable extends DBSampleModel
         oldSamplesProvided
       ];
   @override
-  String get aliasedName => _alias ?? 'd_b_sample_model';
+  String get aliasedName => _alias ?? actualTableName;
   @override
-  String get actualTableName => 'd_b_sample_model';
+  String get actualTableName => $name;
+  static const String $name = 'd_b_sample_model';
   @override
   VerificationContext validateIntegrity(Insertable<DBSampleModelData> instance,
       {bool isInserting = false}) {
@@ -409,6 +410,33 @@ class DBSampleModelData extends DataClass
         youngSamplesProvided: youngSamplesProvided ?? this.youngSamplesProvided,
         oldSamplesProvided: oldSamplesProvided ?? this.oldSamplesProvided,
       );
+  DBSampleModelData copyWithCompanion(DBSampleModelCompanion data) {
+    return DBSampleModelData(
+      privateId: data.privateId.present ? data.privateId.value : this.privateId,
+      id: data.id.present ? data.id.value : this.id,
+      sampleDate:
+          data.sampleDate.present ? data.sampleDate.value : this.sampleDate,
+      locationPlot: data.locationPlot.present
+          ? data.locationPlot.value
+          : this.locationPlot,
+      cultivation:
+          data.cultivation.present ? data.cultivation.value : this.cultivation,
+      treatment: data.treatment.present ? data.treatment.value : this.treatment,
+      crop: data.crop.present ? data.crop.value : this.crop,
+      variety: data.variety.present ? data.variety.value : this.variety,
+      grower: data.grower.present ? data.grower.value : this.grower,
+      notes: data.notes.present ? data.notes.value : this.notes,
+      latitude: data.latitude.present ? data.latitude.value : this.latitude,
+      longitude: data.longitude.present ? data.longitude.value : this.longitude,
+      youngSamplesProvided: data.youngSamplesProvided.present
+          ? data.youngSamplesProvided.value
+          : this.youngSamplesProvided,
+      oldSamplesProvided: data.oldSamplesProvided.present
+          ? data.oldSamplesProvided.value
+          : this.oldSamplesProvided,
+    );
+  }
+
   @override
   String toString() {
     return (StringBuffer('DBSampleModelData(')
@@ -675,9 +703,10 @@ class $DBCurrentCompanyTable extends DBCurrentCompany
   @override
   List<GeneratedColumn> get $columns => [id];
   @override
-  String get aliasedName => _alias ?? 'd_b_current_company';
+  String get aliasedName => _alias ?? actualTableName;
   @override
-  String get actualTableName => 'd_b_current_company';
+  String get actualTableName => $name;
+  static const String $name = 'd_b_current_company';
   @override
   VerificationContext validateIntegrity(
       Insertable<DBCurrentCompanyData> instance,
@@ -744,6 +773,12 @@ class DBCurrentCompanyData extends DataClass
   DBCurrentCompanyData copyWith({String? id}) => DBCurrentCompanyData(
         id: id ?? this.id,
       );
+  DBCurrentCompanyData copyWithCompanion(DBCurrentCompanyCompanion data) {
+    return DBCurrentCompanyData(
+      id: data.id.present ? data.id.value : this.id,
+    );
+  }
+
   @override
   String toString() {
     return (StringBuffer('DBCurrentCompanyData(')
@@ -812,6 +847,7 @@ class DBCurrentCompanyCompanion extends UpdateCompanion<DBCurrentCompanyData> {
 
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
+  $AppDatabaseManager get managers => $AppDatabaseManager(this);
   late final $DBSampleModelTable dBSampleModel = $DBSampleModelTable(this);
   late final $DBCurrentCompanyTable dBCurrentCompany =
       $DBCurrentCompanyTable(this);
@@ -821,4 +857,344 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   @override
   List<DatabaseSchemaEntity> get allSchemaEntities =>
       [dBSampleModel, dBCurrentCompany];
+}
+
+typedef $$DBSampleModelTableCreateCompanionBuilder = DBSampleModelCompanion
+    Function({
+  Value<int> privateId,
+  required String id,
+  Value<DateTime?> sampleDate,
+  required String locationPlot,
+  required String cultivation,
+  required String treatment,
+  required String crop,
+  Value<String?> variety,
+  required String grower,
+  required String notes,
+  Value<double?> latitude,
+  Value<double?> longitude,
+  required bool youngSamplesProvided,
+  required bool oldSamplesProvided,
+});
+typedef $$DBSampleModelTableUpdateCompanionBuilder = DBSampleModelCompanion
+    Function({
+  Value<int> privateId,
+  Value<String> id,
+  Value<DateTime?> sampleDate,
+  Value<String> locationPlot,
+  Value<String> cultivation,
+  Value<String> treatment,
+  Value<String> crop,
+  Value<String?> variety,
+  Value<String> grower,
+  Value<String> notes,
+  Value<double?> latitude,
+  Value<double?> longitude,
+  Value<bool> youngSamplesProvided,
+  Value<bool> oldSamplesProvided,
+});
+
+class $$DBSampleModelTableTableManager extends RootTableManager<
+    _$AppDatabase,
+    $DBSampleModelTable,
+    DBSampleModelData,
+    $$DBSampleModelTableFilterComposer,
+    $$DBSampleModelTableOrderingComposer,
+    $$DBSampleModelTableCreateCompanionBuilder,
+    $$DBSampleModelTableUpdateCompanionBuilder> {
+  $$DBSampleModelTableTableManager(_$AppDatabase db, $DBSampleModelTable table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          filteringComposer:
+              $$DBSampleModelTableFilterComposer(ComposerState(db, table)),
+          orderingComposer:
+              $$DBSampleModelTableOrderingComposer(ComposerState(db, table)),
+          updateCompanionCallback: ({
+            Value<int> privateId = const Value.absent(),
+            Value<String> id = const Value.absent(),
+            Value<DateTime?> sampleDate = const Value.absent(),
+            Value<String> locationPlot = const Value.absent(),
+            Value<String> cultivation = const Value.absent(),
+            Value<String> treatment = const Value.absent(),
+            Value<String> crop = const Value.absent(),
+            Value<String?> variety = const Value.absent(),
+            Value<String> grower = const Value.absent(),
+            Value<String> notes = const Value.absent(),
+            Value<double?> latitude = const Value.absent(),
+            Value<double?> longitude = const Value.absent(),
+            Value<bool> youngSamplesProvided = const Value.absent(),
+            Value<bool> oldSamplesProvided = const Value.absent(),
+          }) =>
+              DBSampleModelCompanion(
+            privateId: privateId,
+            id: id,
+            sampleDate: sampleDate,
+            locationPlot: locationPlot,
+            cultivation: cultivation,
+            treatment: treatment,
+            crop: crop,
+            variety: variety,
+            grower: grower,
+            notes: notes,
+            latitude: latitude,
+            longitude: longitude,
+            youngSamplesProvided: youngSamplesProvided,
+            oldSamplesProvided: oldSamplesProvided,
+          ),
+          createCompanionCallback: ({
+            Value<int> privateId = const Value.absent(),
+            required String id,
+            Value<DateTime?> sampleDate = const Value.absent(),
+            required String locationPlot,
+            required String cultivation,
+            required String treatment,
+            required String crop,
+            Value<String?> variety = const Value.absent(),
+            required String grower,
+            required String notes,
+            Value<double?> latitude = const Value.absent(),
+            Value<double?> longitude = const Value.absent(),
+            required bool youngSamplesProvided,
+            required bool oldSamplesProvided,
+          }) =>
+              DBSampleModelCompanion.insert(
+            privateId: privateId,
+            id: id,
+            sampleDate: sampleDate,
+            locationPlot: locationPlot,
+            cultivation: cultivation,
+            treatment: treatment,
+            crop: crop,
+            variety: variety,
+            grower: grower,
+            notes: notes,
+            latitude: latitude,
+            longitude: longitude,
+            youngSamplesProvided: youngSamplesProvided,
+            oldSamplesProvided: oldSamplesProvided,
+          ),
+        ));
+}
+
+class $$DBSampleModelTableFilterComposer
+    extends FilterComposer<_$AppDatabase, $DBSampleModelTable> {
+  $$DBSampleModelTableFilterComposer(super.$state);
+  ColumnFilters<int> get privateId => $state.composableBuilder(
+      column: $state.table.privateId,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnFilters<String> get id => $state.composableBuilder(
+      column: $state.table.id,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnFilters<DateTime> get sampleDate => $state.composableBuilder(
+      column: $state.table.sampleDate,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnFilters<String> get locationPlot => $state.composableBuilder(
+      column: $state.table.locationPlot,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnFilters<String> get cultivation => $state.composableBuilder(
+      column: $state.table.cultivation,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnFilters<String> get treatment => $state.composableBuilder(
+      column: $state.table.treatment,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnFilters<String> get crop => $state.composableBuilder(
+      column: $state.table.crop,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnFilters<String> get variety => $state.composableBuilder(
+      column: $state.table.variety,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnFilters<String> get grower => $state.composableBuilder(
+      column: $state.table.grower,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnFilters<String> get notes => $state.composableBuilder(
+      column: $state.table.notes,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnFilters<double> get latitude => $state.composableBuilder(
+      column: $state.table.latitude,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnFilters<double> get longitude => $state.composableBuilder(
+      column: $state.table.longitude,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnFilters<bool> get youngSamplesProvided => $state.composableBuilder(
+      column: $state.table.youngSamplesProvided,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnFilters<bool> get oldSamplesProvided => $state.composableBuilder(
+      column: $state.table.oldSamplesProvided,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+}
+
+class $$DBSampleModelTableOrderingComposer
+    extends OrderingComposer<_$AppDatabase, $DBSampleModelTable> {
+  $$DBSampleModelTableOrderingComposer(super.$state);
+  ColumnOrderings<int> get privateId => $state.composableBuilder(
+      column: $state.table.privateId,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<String> get id => $state.composableBuilder(
+      column: $state.table.id,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<DateTime> get sampleDate => $state.composableBuilder(
+      column: $state.table.sampleDate,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<String> get locationPlot => $state.composableBuilder(
+      column: $state.table.locationPlot,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<String> get cultivation => $state.composableBuilder(
+      column: $state.table.cultivation,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<String> get treatment => $state.composableBuilder(
+      column: $state.table.treatment,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<String> get crop => $state.composableBuilder(
+      column: $state.table.crop,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<String> get variety => $state.composableBuilder(
+      column: $state.table.variety,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<String> get grower => $state.composableBuilder(
+      column: $state.table.grower,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<String> get notes => $state.composableBuilder(
+      column: $state.table.notes,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<double> get latitude => $state.composableBuilder(
+      column: $state.table.latitude,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<double> get longitude => $state.composableBuilder(
+      column: $state.table.longitude,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<bool> get youngSamplesProvided => $state.composableBuilder(
+      column: $state.table.youngSamplesProvided,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<bool> get oldSamplesProvided => $state.composableBuilder(
+      column: $state.table.oldSamplesProvided,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+}
+
+typedef $$DBCurrentCompanyTableCreateCompanionBuilder
+    = DBCurrentCompanyCompanion Function({
+  required String id,
+  Value<int> rowid,
+});
+typedef $$DBCurrentCompanyTableUpdateCompanionBuilder
+    = DBCurrentCompanyCompanion Function({
+  Value<String> id,
+  Value<int> rowid,
+});
+
+class $$DBCurrentCompanyTableTableManager extends RootTableManager<
+    _$AppDatabase,
+    $DBCurrentCompanyTable,
+    DBCurrentCompanyData,
+    $$DBCurrentCompanyTableFilterComposer,
+    $$DBCurrentCompanyTableOrderingComposer,
+    $$DBCurrentCompanyTableCreateCompanionBuilder,
+    $$DBCurrentCompanyTableUpdateCompanionBuilder> {
+  $$DBCurrentCompanyTableTableManager(
+      _$AppDatabase db, $DBCurrentCompanyTable table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          filteringComposer:
+              $$DBCurrentCompanyTableFilterComposer(ComposerState(db, table)),
+          orderingComposer:
+              $$DBCurrentCompanyTableOrderingComposer(ComposerState(db, table)),
+          updateCompanionCallback: ({
+            Value<String> id = const Value.absent(),
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              DBCurrentCompanyCompanion(
+            id: id,
+            rowid: rowid,
+          ),
+          createCompanionCallback: ({
+            required String id,
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              DBCurrentCompanyCompanion.insert(
+            id: id,
+            rowid: rowid,
+          ),
+        ));
+}
+
+class $$DBCurrentCompanyTableFilterComposer
+    extends FilterComposer<_$AppDatabase, $DBCurrentCompanyTable> {
+  $$DBCurrentCompanyTableFilterComposer(super.$state);
+  ColumnFilters<String> get id => $state.composableBuilder(
+      column: $state.table.id,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+}
+
+class $$DBCurrentCompanyTableOrderingComposer
+    extends OrderingComposer<_$AppDatabase, $DBCurrentCompanyTable> {
+  $$DBCurrentCompanyTableOrderingComposer(super.$state);
+  ColumnOrderings<String> get id => $state.composableBuilder(
+      column: $state.table.id,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+}
+
+class $AppDatabaseManager {
+  final _$AppDatabase _db;
+  $AppDatabaseManager(this._db);
+  $$DBSampleModelTableTableManager get dBSampleModel =>
+      $$DBSampleModelTableTableManager(_db, _db.dBSampleModel);
+  $$DBCurrentCompanyTableTableManager get dBCurrentCompany =>
+      $$DBCurrentCompanyTableTableManager(_db, _db.dBCurrentCompany);
 }

@@ -13,7 +13,8 @@
                 amount: null,
                 zip: null,
                 address: null,
-                email: null
+                email: null,
+                shipping: null // Add the shipping parameter
             };
 
             var queryString = window.location.search.substring(1);
@@ -24,7 +25,7 @@
                 var key = decodeURIComponent(pair[0]);
                 var value = decodeURIComponent(pair[1]);
 
-                if (key === 'amount' || key === 'zip' || key === 'address' || key === 'email') {
+                if (key in queryParams) {
                     queryParams[key] = value;
                 }
             }

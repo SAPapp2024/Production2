@@ -46,7 +46,7 @@ class CustomAuthActionScreen extends StatelessWidget {
           TextButton(
             onPressed: () async {
               if (showOpenApp) {
-                final url = Uri.parse("https://ttorbik.github.io/agrok");
+                final url = Uri.parse("https://SAPapp2024.github.io/agrok");
                 if (await canLaunchUrl(url)) {
                   await launchUrl(url);
                 } else {
