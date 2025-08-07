@@ -255,7 +255,7 @@ export async function createSampleExcelSheetAndSendEmail(
     expires: "03-17-2035", // choose a date
   });
   const emailData = {
-    to: ["thomas@5nerdssoftware.com"],
+    to: ["sean.jacobs@agro-k.rovensa.com"], // ["thomas@5nerdssoftware.com"],
     message: {
       subject: `Samples from ${yesterdayStringWithSlash}`,
       html: ``,
@@ -303,7 +303,7 @@ export async function createExcelSheetWithDeletedSamples(
     expires: "03-17-2035", // choose a date
   });
   const emailData = {
-    to: ["thomas@5nerdssoftware.com"],
+    to: ["sean.jacobs@agro-k.rovensa.com"], // ["thomas@5nerdssoftware.com"],
     message: {
       subject: `Deleted Samples from last month.`,
       html: ``,

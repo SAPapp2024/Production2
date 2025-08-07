@@ -1684,7 +1684,7 @@ class SampleService {
 
   Future<void> sendUnavailableBarcodeEmail(String barcode, CompanyModel farmModel, UserModel userModel) async {
     var mailData = {
-      'to': "sap@agro-k.com",
+      'to': "sean.jacobs@agro-k.rovensa.com",
       'message': {
         "subject": "Unavailable barcode alert",
         "html": """<p>Company ${farmModel.name} tried to scan barcode $barcode which is not available.</p>"""

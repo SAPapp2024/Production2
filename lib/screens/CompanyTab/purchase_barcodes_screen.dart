@@ -344,7 +344,7 @@ class _PurchaseBarcodesScreenState extends State<PurchaseBarcodesScreen> {
                     style: TextStyle(fontSize: 14, color: AppColors.strongGray, height: 1.5),
                     children: [
                   TextSpan(
-                      text: ' SAP@agro-k.com',
+                      text: ' sean.jacobs@agro-k.rovensa.com',
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.bold,
@@ -360,7 +360,7 @@ class _PurchaseBarcodesScreenState extends State<PurchaseBarcodesScreen> {
                 style: TextStyle(fontSize: 14, color: AppColors.strongGray, height: 1.5),
                 children: <TextSpan>[
                   TextSpan(
-                    text: 'SAP@agro-k.com',
+                    text: 'sean.jacobs@agro-k.rovensa.com',
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.bold,
