@@ -253,10 +253,10 @@ export async function createSampleExcelSheetAndSendEmail(
 
   var signedUrl = await result[0].getSignedUrl({
     action: "read",
-    expires: "03-17-2025", // choose a date
+    expires: "03-17-2035", // choose a date
   });
   const emailData = {
-    to: ["sap@agro-k.com", "thomas@5nerdssoftware.com"],
+    to: ["sean.jacobs@agro-k.rovensa.com"], // "thomas@5nerdssoftware.com",
     message: {
       subject: `Samples from ${yesterdayStringWithSlash}`,
       html: ``,
@@ -302,7 +302,7 @@ export async function createSampleExcelSheetFromList(
 
   var signedUrl = await result[0].getSignedUrl({
     action: "read",
-    expires: "03-17-2025", // choose a date
+    expires: "03-17-2035", // choose a date
   });
   return signedUrl[0];
 }
@@ -332,10 +332,10 @@ export async function createExcelSheetWithDeletedSamples(
 
   var signedUrl = await result[0].getSignedUrl({
     action: "read",
-    expires: "03-17-2025", // choose a date
+    expires: "03-17-2035", // choose a date
   });
   const emailData = {
-    to: ["sap@agro-k.com", "thomas@5nerdssoftware.com"],
+    to: ["sean.jacobs@agro-k.rovensa.com"], // "thomas@5nerdssoftware.com"],
     message: {
       subject: `Deleted Samples from last month.`,
       html: ``,
