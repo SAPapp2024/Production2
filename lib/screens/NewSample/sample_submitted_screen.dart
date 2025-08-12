@@ -187,7 +187,7 @@ class SampleSubmittedScreenState extends State<SampleSubmittedScreen> {
                                           }
                                         },
                                         style: ButtonStyle(
-                                          padding: MaterialStateProperty.all(
+                                          padding: WidgetStateProperty.all(
                                               EdgeInsets.zero),
                                           tapTargetSize:
                                               MaterialTapTargetSize.shrinkWrap,

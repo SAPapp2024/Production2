@@ -1008,7 +1008,7 @@ class UserProfileScreenState extends State<UserProfileScreen> {
           },
           "Error",
           e.message ?? "Unknown error.");
-    } on EmailAlreadyInUseException catch (e) {
+    } on EmailAlreadyInUseException {
       if (!mounted) return;
       showOneButtonAlertDialog(context, "Ok", () {
         Navigator.pop(context);

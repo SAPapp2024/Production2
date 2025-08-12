@@ -503,7 +503,7 @@ class _MobileLogIn extends StatelessWidget {
 }
 
 void goToPrivacyPolicy() {
-  final url =
+  const url =
       'https://agro-k.com/sapAnalysisApp/PrivacyPolicy.html';
   if (kIsWeb) {
     launchUrl(Uri.parse(url));
@@ -513,7 +513,7 @@ void goToPrivacyPolicy() {
 }
 
 void goToTermsOfService(BuildContext context) {
-  final url =
+  const url =
       'https://agro-k.com/sapAnalysisApp/TermsOfService.pdf';
   if (kIsWeb) {
     launchUrl(Uri.parse(url));

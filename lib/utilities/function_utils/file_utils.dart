@@ -731,6 +731,7 @@ Future<File?> generateSamplesExcelFile(List<SampleWithUserModel> samples) async 
       subject: "Sample report",
     );
   }
+  return null;
 }
 
 // Future<void> generateSamplesExcelFile(List<SampleWithUserModel> samples) async {
@@ -885,12 +886,12 @@ Future<void> createMergedPdf(MergeSamplesOptions option, widgets.RenderBox box, 
 }
 
 Future<File> downloadFile(String url, String filename) async {
-  var httpClient = new HttpClient();
+  var httpClient = HttpClient();
   var request = await httpClient.getUrl(Uri.parse(url));
   var response = await request.close();
   var bytes = await consolidateHttpClientResponseBytes(response);
   String dir = (await getTemporaryDirectory()).path;
-  File file = new File('$dir/$filename');
+  File file = File('$dir/$filename');
   await file.writeAsBytes(bytes);
   return file;
 }

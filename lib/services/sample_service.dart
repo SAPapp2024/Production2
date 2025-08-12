@@ -1889,7 +1889,7 @@ class SampleService {
             throw Exception("Barcode ${barcodeItem.barcode} is assigned to a sample");
           }
           return barcodeItem;
-        } on FirebaseException catch (e) {
+        } on FirebaseException {
           rethrow;
         } catch (e) {
           throw Exception("Barcode data malformed");

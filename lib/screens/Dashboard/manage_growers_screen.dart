@@ -118,7 +118,7 @@ class _ManageGrowersScreenState extends State<ManageGrowersScreen> {
                             padding: const EdgeInsets.all(16.0),
                             child: ElevatedButton(
                                 style: ButtonStyle(
-                                    backgroundColor: MaterialStateProperty.all(
+                                    backgroundColor: WidgetStateProperty.all(
                                         AppColors.appPrimaryGreen)),
                                 onPressed: () {
                                   uploadAndProcessGrowers();
@@ -129,7 +129,7 @@ class _ManageGrowersScreenState extends State<ManageGrowersScreen> {
                             padding: const EdgeInsets.all(16.0),
                             child: ElevatedButton(
                                 style: ButtonStyle(
-                                    backgroundColor: MaterialStateProperty.all(
+                                    backgroundColor: WidgetStateProperty.all(
                                         AppColors.appPrimaryGreen)),
                                 onPressed: () {
                                   addOrEditNewGrower(null);
@@ -201,7 +201,7 @@ class _ManageGrowersScreenState extends State<ManageGrowersScreen> {
             ElevatedButton(
                 style: ButtonStyle(
                     backgroundColor:
-                        MaterialStateProperty.all(AppColors.appPrimaryGreen)),
+                        WidgetStateProperty.all(AppColors.appPrimaryGreen)),
                 onPressed: () {
                   getGrowers();
                 },
@@ -212,7 +212,7 @@ class _ManageGrowersScreenState extends State<ManageGrowersScreen> {
             ElevatedButton(
                 style: ButtonStyle(
                     backgroundColor:
-                        MaterialStateProperty.all(AppColors.appPrimaryGreen)),
+                        WidgetStateProperty.all(AppColors.appPrimaryGreen)),
                 onPressed: () {
                   _searchGrowerValue.text = "";
                   setState(() {
@@ -227,7 +227,7 @@ class _ManageGrowersScreenState extends State<ManageGrowersScreen> {
             ElevatedButton(
                 style: ButtonStyle(
                     backgroundColor:
-                        MaterialStateProperty.all(AppColors.appPrimaryGreen)),
+                        WidgetStateProperty.all(AppColors.appPrimaryGreen)),
                 onPressed: () async {
                   try {
                     setState(() {
@@ -402,7 +402,7 @@ class _ManageGrowersScreenState extends State<ManageGrowersScreen> {
                       .mapIndexed(
                         (index, e) => DataRow.byIndex(
                             index: index,
-                            color: MaterialStateColor.resolveWith(
+                            color: WidgetStateColor.resolveWith(
                               (states) {
                                 if (index % 2 == 0) {
                                   return AppColors.tableRowBackground;

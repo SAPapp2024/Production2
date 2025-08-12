@@ -1,6 +1,4 @@
-import 'package:agro_k/app/setup/injectable_setup.dart';
 import 'package:agro_k/utilities/enums/environment_enum.dart';
-import 'package:flutter/foundation.dart';
 
 enum PaymentStatus { approved, error, canceled, declined, unknown }
 

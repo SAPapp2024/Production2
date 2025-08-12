@@ -8,7 +8,6 @@ import 'package:agro_k/utilities/remote_error_logging_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:collection/collection.dart';
 import 'package:equatable/equatable.dart';
-import 'package:flutter/foundation.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'sample_model.g.dart';

@@ -1,4 +1,3 @@
-import 'dart:io';
 
 import 'package:typesense/typesense.dart';
 

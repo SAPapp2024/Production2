@@ -1068,7 +1068,7 @@ class _PdfWebViewScreenState extends State<PdfWebViewScreen> {
       ),
       body: file == null
           ? const Center(child: CircularProgressIndicator())
-          : Container(
+          : SizedBox(
               width: double.infinity,
               height: double.infinity,
               child: PdfViewer.openFile(

@@ -1,6 +1,5 @@
 import 'package:agro_k/screens/Dashboard/dashboard_screen/mobile_dashboard.dart';
 import 'package:agro_k/screens/Dashboard/dashboard_screen/web_dashboard.dart';
-import 'package:agro_k/theme/colors.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 

@@ -657,15 +657,15 @@ class MembersScreenState extends State<MembersScreen> {
                                               });
                                         },
                                         style: ButtonStyle(
-                                          padding: MaterialStateProperty.all(
+                                          padding: WidgetStateProperty.all(
                                               EdgeInsets.zero),
                                           minimumSize:
-                                              MaterialStateProperty.all(
+                                              WidgetStateProperty.all(
                                                   const Size(50, 20)),
                                           tapTargetSize:
                                               MaterialTapTargetSize.shrinkWrap,
                                         ),
-                                        icon: Icon(Icons.more_vert_outlined)),
+                                        icon: const Icon(Icons.more_vert_outlined)),
                                   ),
                               ],
                             )
@@ -861,15 +861,15 @@ class MembersScreenState extends State<MembersScreen> {
                                                     });
                                               },
                                               style: ButtonStyle(
-                                                padding: MaterialStateProperty.all(
+                                                padding: WidgetStateProperty.all(
                                                     EdgeInsets.zero),
                                                 minimumSize:
-                                                MaterialStateProperty.all(
+                                                WidgetStateProperty.all(
                                                     const Size(50, 20)),
                                                 tapTargetSize:
                                                 MaterialTapTargetSize.shrinkWrap,
                                               ),
-                                              icon: Icon(Icons.more_vert_outlined)),
+                                              icon: const Icon(Icons.more_vert_outlined)),
                                         ),
                                     ],
                                   )

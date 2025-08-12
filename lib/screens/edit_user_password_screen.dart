@@ -3,17 +3,13 @@ import 'package:agro_k/app/setup/user_state.dart';
 import 'package:agro_k/components/app_text_form_field.dart';
 import 'package:agro_k/components/custom_card.dart';
 import 'package:agro_k/components/primary_button.dart';
-import 'package:agro_k/models/user/phone_model.dart';
 import 'package:agro_k/models/user/user_model.dart';
 import 'package:agro_k/services/profile_service.dart';
 import 'package:agro_k/theme/colors.dart';
-import 'package:agro_k/utilities/function_utils/string_utils.dart';
 import 'package:agro_k/utilities/function_utils/view_utils.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl_phone_field/countries.dart';
-import 'package:intl_phone_field/intl_phone_field.dart';
 
 class EditUserPasswordScreenArguments {
   final UserModel user;

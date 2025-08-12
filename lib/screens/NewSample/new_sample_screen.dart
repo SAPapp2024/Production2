@@ -976,7 +976,9 @@ class NewSampleScreenState extends State<NewSampleScreen> {
   Future<void> saveSample(BuildContext context) async {
     if (!(_formKey.currentState != null &&
         _formKey.currentState!.validate() &&
-        (_newYoungSamplesProvided || _newOldSamplesProvided))) return;
+        (_newYoungSamplesProvided || _newOldSamplesProvided))) {
+      return;
+    }
     setState(() {
       isLoading = true;
     });

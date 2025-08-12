@@ -146,8 +146,8 @@ class _CompaniesManagementScreenState extends State<CompaniesManagementScreen> {
 
   Widget createUserTable(BuildContext context) {
     var items = [
+      const DropdownMenuItem(value: 10, child: Text("10")),
       const DropdownMenuItem(value: 25, child: Text("25")),
-      const DropdownMenuItem(value: 50, child: Text("50")),
       const DropdownMenuItem(value: 100, child: Text("100"))
     ];
     topListNum = (dashboardPageNum * entriesSelected) - entriesSelected;
@@ -181,7 +181,7 @@ class _CompaniesManagementScreenState extends State<CompaniesManagementScreen> {
             ElevatedButton(
                 style: ButtonStyle(
                     backgroundColor:
-                        MaterialStateProperty.all(AppColors.appPrimaryGreen)),
+                        WidgetStateProperty.all(AppColors.appPrimaryGreen)),
                 onPressed: () {
                   searchCompanies();
                 },
@@ -192,7 +192,7 @@ class _CompaniesManagementScreenState extends State<CompaniesManagementScreen> {
             ElevatedButton(
                 style: ButtonStyle(
                     backgroundColor:
-                        MaterialStateProperty.all(AppColors.appPrimaryGreen)),
+                        WidgetStateProperty.all(AppColors.appPrimaryGreen)),
                 onPressed: () {
                   _searchAddress.text = "";
                   _searchPhone.text = "";
@@ -213,7 +213,7 @@ class _CompaniesManagementScreenState extends State<CompaniesManagementScreen> {
             ElevatedButton(
                 style: ButtonStyle(
                     backgroundColor:
-                    MaterialStateProperty
+                    WidgetStateProperty
                         .all(AppColors
                         .appPrimaryGreen)),
                 onPressed: () async {
@@ -685,7 +685,7 @@ class _CompaniesManagementScreenState extends State<CompaniesManagementScreen> {
                         .mapIndexed(
                           (index, e) => DataRow.byIndex(
                               index: index,
-                              color: MaterialStateColor.resolveWith(
+                              color: WidgetStateColor.resolveWith(
                                 (states) {
                                   if (e.id == widget.highlightedCompanyId) {
                                     return Colors.yellowAccent;

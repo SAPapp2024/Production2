@@ -200,7 +200,7 @@ class _ManageUsersScreenState extends State<ManageUsersScreen> {
             ElevatedButton(
                 style: ButtonStyle(
                     backgroundColor:
-                        MaterialStateProperty.all(AppColors.appPrimaryGreen)),
+                        WidgetStateProperty.all(AppColors.appPrimaryGreen)),
                 onPressed: () {
                   searchUsers();
                 },
@@ -211,7 +211,7 @@ class _ManageUsersScreenState extends State<ManageUsersScreen> {
             ElevatedButton(
                 style: ButtonStyle(
                     backgroundColor:
-                        MaterialStateProperty.all(AppColors.appPrimaryGreen)),
+                        WidgetStateProperty.all(AppColors.appPrimaryGreen)),
                 onPressed: () {
                   _searchFirstName.text = "";
                   _searchLastName.text = "";
@@ -230,7 +230,7 @@ class _ManageUsersScreenState extends State<ManageUsersScreen> {
             ElevatedButton(
                 style: ButtonStyle(
                     backgroundColor:
-                    MaterialStateProperty
+                    WidgetStateProperty
                         .all(AppColors
                         .appPrimaryGreen)),
                 onPressed: () async {
@@ -553,7 +553,7 @@ class _ManageUsersScreenState extends State<ManageUsersScreen> {
                         .mapIndexed(
                           (index, e) => DataRow.byIndex(
                               index: index,
-                              color: MaterialStateColor.resolveWith(
+                              color: WidgetStateColor.resolveWith(
                                 (states) {
                                   if (e.id == widget.highlightedUserId) {
                                     return Colors.yellowAccent;
@@ -912,7 +912,7 @@ class _ManageUsersScreenState extends State<ManageUsersScreen> {
       try {
         await authService.editUserEmail(userModel, controller.text);
         userModel.email = controller.text;
-      } on EmailAlreadyInUseException catch (exception) {
+      } on EmailAlreadyInUseException {
         if (!mounted) return;
         showOneButtonAlertDialog(
             context,

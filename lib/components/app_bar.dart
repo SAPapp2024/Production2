@@ -2,7 +2,6 @@ import 'package:agro_k/models/company/company_model.dart';
 import 'package:agro_k/models/user/user_with_companies_model.dart';
 import 'package:agro_k/theme/colors.dart';
 import 'package:agro_k/utilities/function_utils/string_utils.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 

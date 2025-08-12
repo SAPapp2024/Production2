@@ -87,7 +87,7 @@ class _ManageCropsScreenState extends State<ManageCropsScreen> {
                           Padding(
                             padding: const EdgeInsets.all(16.0),
                             child: ElevatedButton(
-                                style: ButtonStyle(backgroundColor: MaterialStateProperty.all(AppColors.appPrimaryGreen)),
+                                style: ButtonStyle(backgroundColor: WidgetStateProperty.all(AppColors.appPrimaryGreen)),
                                 onPressed: () {
                                   uploadAndProcessCrops();
                                 },
@@ -96,7 +96,7 @@ class _ManageCropsScreenState extends State<ManageCropsScreen> {
                           Padding(
                             padding: const EdgeInsets.all(16.0),
                             child: ElevatedButton(
-                                style: ButtonStyle(backgroundColor: MaterialStateProperty.all(AppColors.appPrimaryGreen)),
+                                style: ButtonStyle(backgroundColor: WidgetStateProperty.all(AppColors.appPrimaryGreen)),
                                 onPressed: () {
                                   addNewCrop();
                                 },
@@ -220,7 +220,7 @@ class _ManageCropsScreenState extends State<ManageCropsScreen> {
               width: 15,
             ),
             ElevatedButton(
-                style: ButtonStyle(backgroundColor: MaterialStateProperty.all(AppColors.appPrimaryGreen)),
+                style: ButtonStyle(backgroundColor: WidgetStateProperty.all(AppColors.appPrimaryGreen)),
                 onPressed: () {
                   searchCrops();
                 },
@@ -229,7 +229,7 @@ class _ManageCropsScreenState extends State<ManageCropsScreen> {
               width: 15,
             ),
             ElevatedButton(
-                style: ButtonStyle(backgroundColor: MaterialStateProperty.all(AppColors.appPrimaryGreen)),
+                style: ButtonStyle(backgroundColor: WidgetStateProperty.all(AppColors.appPrimaryGreen)),
                 onPressed: () {
                   _searchCropId.text = "";
                   _searchCropName.text = "";
@@ -247,7 +247,7 @@ class _ManageCropsScreenState extends State<ManageCropsScreen> {
             ElevatedButton(
                 style: ButtonStyle(
                     backgroundColor:
-                    MaterialStateProperty
+                    WidgetStateProperty
                         .all(AppColors
                         .appPrimaryGreen)),
                 onPressed: () async {
@@ -470,7 +470,7 @@ class _ManageCropsScreenState extends State<ManageCropsScreen> {
                       .mapIndexed(
                         (index, e) => DataRow.byIndex(
                             index: index,
-                            color: MaterialStateColor.resolveWith(
+                            color: WidgetStateColor.resolveWith(
                               (states) {
                                 if (index % 2 == 0) {
                                   return AppColors.tableRowBackground;

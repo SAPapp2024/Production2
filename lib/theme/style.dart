@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 ThemeData appTheme() {
   const style = TextStyle(fontFeatures: [FontFeature.proportionalFigures()]);
   return ThemeData.light().copyWith(
-    useMaterial3: false,
     textSelectionTheme: const TextSelectionThemeData(cursorColor: AppColors.appPrimaryGreen),
     visualDensity: VisualDensity.adaptivePlatformDensity,
     primaryColor: AppColors.black1,

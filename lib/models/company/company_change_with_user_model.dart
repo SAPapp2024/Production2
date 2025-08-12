@@ -1,5 +1,4 @@
 import 'package:agro_k/models/user/company_change_model.dart';
-import 'package:agro_k/models/user/user_change_model.dart';
 import 'package:agro_k/models/user/user_model.dart';
 
 class CompanyChangeWithUserModel {

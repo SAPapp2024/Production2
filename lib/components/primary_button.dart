@@ -47,12 +47,12 @@ class PrimaryButton extends StatelessWidget {
           }
         }
         style = ButtonStyle(
-          shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+          shape: WidgetStateProperty.all<RoundedRectangleBorder>(
               RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(100.0),
           )),
-          foregroundColor: MaterialStateProperty.all(textColor ?? Colors.white),
-          backgroundColor: MaterialStateProperty.all(
+          foregroundColor: WidgetStateProperty.all(textColor ?? Colors.white),
+          backgroundColor: WidgetStateProperty.all(
               onPressed != null ? backgroundColor : AppColors.grayTextColor),
         );
         break;
@@ -67,11 +67,11 @@ class PrimaryButton extends StatelessWidget {
             break;
         }
         style = ButtonStyle(
-          shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+          shape: WidgetStateProperty.all<RoundedRectangleBorder>(
               RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(100.0),
           )),
-          foregroundColor: MaterialStateProperty.all(foregroundColor),
+          foregroundColor: WidgetStateProperty.all(foregroundColor),
         );
         break;
       case PrimaryButtonType.outlined:
@@ -85,21 +85,21 @@ class PrimaryButton extends StatelessWidget {
             break;
         }
         style = ButtonStyle(
-          shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+          shape: WidgetStateProperty.all<RoundedRectangleBorder>(
               RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(100.0),
             side: const BorderSide(color: AppColors.appGray, width: 1),
           )),
-          foregroundColor: MaterialStateProperty.all(foregroundColor),
+          foregroundColor: WidgetStateProperty.all(foregroundColor),
         );
         break;
     }
     return TextButton(
       onPressed: onPressed,
       style: style.copyWith(
-        minimumSize: MaterialStateProperty.all(Size.zero),
+        minimumSize: WidgetStateProperty.all(Size.zero),
         tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-        padding: MaterialStateProperty.all(padding),
+        padding: WidgetStateProperty.all(padding),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,

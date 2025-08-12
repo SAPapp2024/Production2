@@ -172,14 +172,14 @@ class _CompanySamplesScreenState extends State<CompanySamplesScreen>
                       });
                     },
           style: ButtonStyle(
-            backgroundColor: MaterialStateProperty.all(
+            backgroundColor: WidgetStateProperty.all(
                 isCurrentFilter ? Colors.white : AppColors.appPrimaryGreen),
-            foregroundColor: MaterialStateProperty.all(
+            foregroundColor: WidgetStateProperty.all(
                 isCurrentFilter ? AppColors.appPrimaryGreen : Colors.white),
-            padding: MaterialStateProperty.all(const EdgeInsets.all(4)),
-            side: MaterialStateProperty.all(
+            padding: WidgetStateProperty.all(const EdgeInsets.all(4)),
+            side: WidgetStateProperty.all(
                 const BorderSide(color: Colors.white, width: 1.0)),
-            shape: MaterialStateProperty.all(const RoundedRectangleBorder(
+            shape: WidgetStateProperty.all(const RoundedRectangleBorder(
                 borderRadius: BorderRadius.all(Radius.circular(100)))),
           ),
           child: Padding(
@@ -818,25 +818,25 @@ class _CompanySamplesScreenState extends State<CompanySamplesScreen>
                               },
                               style: ButtonStyle(
                                 minimumSize:
-                                    MaterialStateProperty.all(Size.zero),
+                                    WidgetStateProperty.all(Size.zero),
                                 tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                                backgroundColor: MaterialStateProperty.all(
+                                backgroundColor: WidgetStateProperty.all(
                                     !isSampleSelected
                                         ? Colors.white
                                         : AppColors.appPrimaryGreen),
-                                foregroundColor: MaterialStateProperty.all(
+                                foregroundColor: WidgetStateProperty.all(
                                     !isSampleSelected
                                         ? AppColors.appPrimaryGreen
                                         : Colors.white),
-                                padding: MaterialStateProperty.all(
+                                padding: WidgetStateProperty.all(
                                     const EdgeInsets.symmetric(
                                         vertical: 6.5, horizontal: 11)),
-                                side: MaterialStateProperty.all(BorderSide(
+                                side: WidgetStateProperty.all(BorderSide(
                                     color: !isSampleSelected
                                         ? AppColors.appPrimaryGreen
                                         : Colors.white,
                                     width: 1.0)),
-                                shape: MaterialStateProperty.all(
+                                shape: WidgetStateProperty.all(
                                     const RoundedRectangleBorder(
                                         borderRadius: BorderRadius.all(
                                             Radius.circular(8)))),
@@ -846,7 +846,7 @@ class _CompanySamplesScreenState extends State<CompanySamplesScreen>
                                 style: const TextStyle(
                                     fontSize: 16, fontWeight: FontWeight.w500),
                               )),
-                          Spacer()
+                          const Spacer()
                         ],
                       ),
                     ),

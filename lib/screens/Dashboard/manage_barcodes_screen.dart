@@ -130,7 +130,7 @@ class _ManageBarcodesScreenState extends State<ManageBarcodesScreen> {
                                   padding: const EdgeInsets.all(16.0),
                                   child: ElevatedButton(
                                       style: ButtonStyle(
-                                          backgroundColor: MaterialStateProperty.all(AppColors.appPrimaryGreen)),
+                                          backgroundColor: WidgetStateProperty.all(AppColors.appPrimaryGreen)),
                                       onPressed: () {
                                         uploadAndProcessBarcodes();
                                       },
@@ -140,7 +140,7 @@ class _ManageBarcodesScreenState extends State<ManageBarcodesScreen> {
                                   padding: const EdgeInsets.all(16.0),
                                   child: ElevatedButton(
                                       style: ButtonStyle(
-                                          backgroundColor: MaterialStateProperty.all(AppColors.appPrimaryGreen)),
+                                          backgroundColor: WidgetStateProperty.all(AppColors.appPrimaryGreen)),
                                       onPressed: () {
                                         addNewBarcode();
                                       },
@@ -150,7 +150,7 @@ class _ManageBarcodesScreenState extends State<ManageBarcodesScreen> {
                                   padding: const EdgeInsets.all(16.0),
                                   child: ElevatedButton(
                                       style: ButtonStyle(
-                                          backgroundColor: MaterialStateProperty.all(AppColors.appPrimaryGreen)),
+                                          backgroundColor: WidgetStateProperty.all(AppColors.appPrimaryGreen)),
                                       onPressed: () {
                                         assignBarcodes();
                                       },
@@ -163,7 +163,7 @@ class _ManageBarcodesScreenState extends State<ManageBarcodesScreen> {
                                   padding: const EdgeInsets.all(16.0),
                                   child: ElevatedButton(
                                       style: ButtonStyle(
-                                          backgroundColor: MaterialStateProperty.all(AppColors.appPrimaryGreen)),
+                                          backgroundColor: WidgetStateProperty.all(AppColors.appPrimaryGreen)),
                                       onPressed: () async {
                                         bool result = await context.pushNamed<bool>(PurchaseBarcodesScreen.id) ?? false;
                                         if (result) {
@@ -238,7 +238,7 @@ class _ManageBarcodesScreenState extends State<ManageBarcodesScreen> {
               width: 15,
             ),
             ElevatedButton(
-                style: ButtonStyle(backgroundColor: MaterialStateProperty.all(AppColors.appPrimaryGreen)),
+                style: ButtonStyle(backgroundColor: WidgetStateProperty.all(AppColors.appPrimaryGreen)),
                 onPressed: () {
                   searchBarcodes();
                 },
@@ -247,7 +247,7 @@ class _ManageBarcodesScreenState extends State<ManageBarcodesScreen> {
               width: 15,
             ),
             ElevatedButton(
-                style: ButtonStyle(backgroundColor: MaterialStateProperty.all(AppColors.appPrimaryGreen)),
+                style: ButtonStyle(backgroundColor: WidgetStateProperty.all(AppColors.appPrimaryGreen)),
                 onPressed: () {
                   _searchBarcodeValue.text = "";
                   _searchBarcodeType.text = "";
@@ -261,7 +261,7 @@ class _ManageBarcodesScreenState extends State<ManageBarcodesScreen> {
               width: 35,
             ),
             ElevatedButton(
-                style: ButtonStyle(backgroundColor: MaterialStateProperty.all(AppColors.appPrimaryGreen)),
+                style: ButtonStyle(backgroundColor: WidgetStateProperty.all(AppColors.appPrimaryGreen)),
                 onPressed: () async {
                   try {
                     setState(() {
@@ -284,7 +284,7 @@ class _ManageBarcodesScreenState extends State<ManageBarcodesScreen> {
                 width: 35,
               ),
               ElevatedButton(
-                style: ButtonStyle(backgroundColor: MaterialStateProperty.all(AppColors.appPrimaryGreen)),
+                style: ButtonStyle(backgroundColor: WidgetStateProperty.all(AppColors.appPrimaryGreen)),
                 onPressed: () async {
                   if (barcodesCheckedToReclaim.length > 499) {
                     showOneButtonAlertDialog(
@@ -624,7 +624,7 @@ class _ManageBarcodesScreenState extends State<ManageBarcodesScreen> {
                           (index, e) {
                             return DataRow.byIndex(
                                 index: index,
-                                color: MaterialStateColor.resolveWith(
+                                color: WidgetStateColor.resolveWith(
                                   (states) {
                                     if (index % 2 == 0) {
                                       return AppColors.tableRowBackground;

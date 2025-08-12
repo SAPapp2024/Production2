@@ -177,9 +177,9 @@ class _SelectUserDialogWidgetState extends State<SelectUserDialogWidget> {
                                       },
                                       style: ButtonStyle(
                                           foregroundColor:
-                                              MaterialStateProperty.all(
+                                              WidgetStateProperty.all(
                                                   AppColors.appbarGreen),
-                                          shape: MaterialStateProperty.all<
+                                          shape: WidgetStateProperty.all<
                                                   RoundedRectangleBorder>(
                                               RoundedRectangleBorder(
                                                   borderRadius:
@@ -205,12 +205,12 @@ class _SelectUserDialogWidgetState extends State<SelectUserDialogWidget> {
                                       },
                                       style: ButtonStyle(
                                           backgroundColor:
-                                              MaterialStateProperty.all(
+                                              WidgetStateProperty.all(
                                                   AppColors.appbarGreen),
                                           foregroundColor:
-                                              MaterialStateProperty.all(
+                                              WidgetStateProperty.all(
                                                   Colors.white),
-                                          shape: MaterialStateProperty.all<
+                                          shape: WidgetStateProperty.all<
                                                   RoundedRectangleBorder>(
                                               RoundedRectangleBorder(
                                                   borderRadius:

@@ -441,7 +441,7 @@ class WebDashboardState extends State<WebDashboard> {
                                   child: ElevatedButton(
                                       style: ButtonStyle(
                                           backgroundColor:
-                                              MaterialStateProperty.all(
+                                              WidgetStateProperty.all(
                                                   AppColors.appPrimaryGreen)),
                                       onPressed: () {
                                         uploadAndProcessSampleTests();
@@ -457,7 +457,7 @@ class WebDashboardState extends State<WebDashboard> {
                                   child: ElevatedButton(
                                       style: ButtonStyle(
                                           backgroundColor:
-                                              MaterialStateProperty.all(
+                                              WidgetStateProperty.all(
                                                   AppColors.appPrimaryGreen)),
                                       onPressed: () {
                                         context.pushNamed(ManageUsersScreen.id);
@@ -473,7 +473,7 @@ class WebDashboardState extends State<WebDashboard> {
                                   child: ElevatedButton(
                                       style: ButtonStyle(
                                           backgroundColor:
-                                              MaterialStateProperty.all(
+                                              WidgetStateProperty.all(
                                                   AppColors.appPrimaryGreen)),
                                       onPressed: () {
                                         context.pushNamed(
@@ -490,7 +490,7 @@ class WebDashboardState extends State<WebDashboard> {
                                   child: ElevatedButton(
                                       style: ButtonStyle(
                                           backgroundColor:
-                                              MaterialStateProperty.all(
+                                              WidgetStateProperty.all(
                                                   AppColors.appPrimaryGreen)),
                                       onPressed: () {
                                         context.pushNamed(ManageCropsScreen.id);
@@ -512,7 +512,7 @@ class WebDashboardState extends State<WebDashboard> {
                                   child: ElevatedButton(
                                       style: ButtonStyle(
                                           backgroundColor:
-                                              MaterialStateProperty.all(
+                                              WidgetStateProperty.all(
                                                   AppColors.appPrimaryGreen)),
                                       onPressed: () {
                                         context
@@ -532,11 +532,11 @@ class WebDashboardState extends State<WebDashboard> {
                                           customButton: ElevatedButton(
                                             style: ButtonStyle(
                                                 backgroundColor:
-                                                    MaterialStateProperty.all(
+                                                    WidgetStateProperty.all(
                                                         AppColors
                                                             .appPrimaryGreen),
                                                 foregroundColor:
-                                                    MaterialStateProperty.all(
+                                                    WidgetStateProperty.all(
                                                         Colors.white)),
                                             onPressed: () {
                                               downloadTemplateDropdownKey
@@ -629,7 +629,7 @@ class WebDashboardState extends State<WebDashboard> {
                                             ElevatedButton(
                                                 style: ButtonStyle(
                                                     backgroundColor:
-                                                        MaterialStateProperty
+                                                        WidgetStateProperty
                                                             .all(AppColors
                                                                 .appPrimaryGreen)),
                                                 onPressed: () {
@@ -642,7 +642,7 @@ class WebDashboardState extends State<WebDashboard> {
                                             ElevatedButton(
                                                 style: ButtonStyle(
                                                     backgroundColor:
-                                                        MaterialStateProperty
+                                                        WidgetStateProperty
                                                             .all(AppColors
                                                                 .appPrimaryGreen)),
                                                 onPressed: () {
@@ -682,7 +682,7 @@ class WebDashboardState extends State<WebDashboard> {
                                             ElevatedButton(
                                                 style: ButtonStyle(
                                                     backgroundColor:
-                                                        MaterialStateProperty
+                                                        WidgetStateProperty
                                                             .all(AppColors
                                                                 .appPrimaryGreen)),
                                                 onPressed: () async {
@@ -718,7 +718,7 @@ class WebDashboardState extends State<WebDashboard> {
                                               ElevatedButton(
                                                 style: ButtonStyle(
                                                     backgroundColor:
-                                                        MaterialStateProperty
+                                                        WidgetStateProperty
                                                             .all(AppColors
                                                                 .appPrimaryGreen)),
                                                 onPressed: () async {
@@ -1122,7 +1122,9 @@ class WebDashboardState extends State<WebDashboard> {
                   if (row[0]?.props[0] == null ||
                       row[1]?.props[0] == null ||
                       row[2]?.props[0] == null ||
-                      row[3]?.props[0] == null) return null;
+                      row[3]?.props[0] == null) {
+                    return null;
+                  }
                   String crop = row[0]!.props[0] as String;
                   String mineral = row[1]!.props[0] as String;
                   double? optimumMin =
@@ -1812,7 +1814,7 @@ class WebDashboardState extends State<WebDashboard> {
           rows: data
               .mapIndexed((index, e) => DataRow.byIndex(
                   index: index,
-                  color: MaterialStateColor.resolveWith(
+                  color: WidgetStateColor.resolveWith(
                     (states) {
                       if (index % 2 == 0) {
                         return AppColors.tableRowBackground;
@@ -1899,11 +1901,11 @@ class WebDashboardState extends State<WebDashboard> {
                                         )));
                           },
                           style: ButtonStyle(
-                            backgroundColor: MaterialStateProperty.all(
+                            backgroundColor: WidgetStateProperty.all(
                                 AppColors.appPrimaryGreen),
                             foregroundColor:
-                                MaterialStateProperty.all(Colors.white),
-                            padding: MaterialStateProperty.all(
+                                WidgetStateProperty.all(Colors.white),
+                            padding: WidgetStateProperty.all(
                                 const EdgeInsets.all(4)),
                           ),
                           child: Text(

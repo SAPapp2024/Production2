@@ -1,7 +1,6 @@
 import 'package:agro_k/models/company/company_model.dart';
 import 'package:agro_k/models/invites/invites_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/foundation.dart';
 import 'package:agro_k/app/setup/injectable_setup.dart';
 import 'package:agro_k/utilities/remote_error_logging_service.dart';
 

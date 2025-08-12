@@ -1,7 +1,6 @@
 import 'package:agro_k/components/custom_card.dart';
 import 'package:agro_k/theme/colors.dart';
 import 'package:agro_k/utilities/utility_models/info_row.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class CardWithInfoRows extends StatelessWidget {

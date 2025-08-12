@@ -1,6 +1,5 @@
 import 'package:agro_k/models/company/company_model.dart';
 import 'package:agro_k/theme/colors.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class CompanyCard extends StatelessWidget {

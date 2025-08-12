@@ -1,6 +1,5 @@
 import 'package:agro_k/components/custom_card.dart';
 import 'package:agro_k/theme/colors.dart';
-import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 
 class MenuOptionsPopup<T extends Enum> extends StatelessWidget {
