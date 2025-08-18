@@ -18,7 +18,10 @@ pubspec.lock
 Thumbs.db
 
 # Firebase / Secrets (VERY IMPORTANT)
+# Only ignore keys/secrets, not all JSONs
 scripts/serviceAccountKey*.json
+/serviceAccountKey*.json
+
 *.keystore
 *.jks
 *.p12
