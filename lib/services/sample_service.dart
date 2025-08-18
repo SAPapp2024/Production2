@@ -99,13 +99,19 @@ class SampleService {
         newSampleData['oldSampleBarcode'] = oldSampleBarcode;
         newBarcodes = AssignedBarcodes(youngSampleBarcode: youngSampleBarcode, oldSampleBarcode: oldSampleBarcode);
         var companyReference = FirebaseFirestore.instance.collection("companies").doc(farm.id);
-        newSampleData['companyReference'] = companyReference;
-        newSampleData['companyName'] = farm.name;
-        newSampleData['userReference'] = userRef;
+        newSampleData['companyReference'] = companyReference;      // DocumentReference
+        newSampleData['companyName'] = farm.name;                  // String
+        newSampleData['userReference'] = userRef;                  // DocumentReference
+        newSampleData['userUid'] = FirebaseAuth.instance.currentUser!.uid; // 👈 add string mirror
         newSampleData['status'] = SampleStatusConstants.userSubmitted;
-        DateTime nowWithoutHourDetails = onlyDMY(DateTime.now());
-        newSampleData['createdDate'] = nowWithoutHourDetails;
+        newSampleData['createdDate'] = FieldValue.serverTimestamp();        // 👈 true timestamp
+        newSampleData['createdDateDMY'] = onlyDMY(DateTime.now());          // (optional) keep date-only for grouping
+        newSampleData['printed'] = false;                                    // (optional) explicit default
         newSampleData['prints'] = [];
+        newSampleData['userUid'] = FirebaseAuth.instance.currentUser!.uid; // add this
+        newSampleData['createdDate'] = FieldValue.serverTimestamp();       // switch to server time
+        // (keep createdDateDMY if you still use day-only grouping)
+
       }
 
       if (changeId != null) {
@@ -347,7 +353,10 @@ class SampleService {
     Query<Map<String, dynamic>> query = FirebaseFirestore.instance
         .collection('samples')
         .where("id", isNull: false)
-        .where("companyReference", isEqualTo: companyReference);
+        .where("companyReference", isEqualTo: companyReference)
+        .where("userUid", isEqualTo: FirebaseAuth.instance.currentUser!.uid) // ← 2B goes here
+        .orderBy("createdDate", descending: true);                             // ← strongly recommended
+
     var samples = await query.get();
     debugPrint("samples.docs ${samples.docs}");
     List<SampleModel> sampleList = [];

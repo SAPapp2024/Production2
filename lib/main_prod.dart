@@ -4,6 +4,8 @@ import 'package:agro_k/utilities/enums/environment_enum.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
+WidgetsFlutterBinding.ensureInitialized();
+
 bool isVerified = false;
 
 Future<void> main() async {
