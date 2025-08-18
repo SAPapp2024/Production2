@@ -1,0 +1,26 @@
+# Flutter/Dart
+.dart_tool/
+.packages
+.pub-cache/
+build/
+ios/Pods/
+android/.gradle/
+android/app/build/
+**/generated/
+pubspec.lock
+
+# IDE
+.idea/
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Firebase / Secrets (VERY IMPORTANT)
+scripts/serviceAccountKey*.json
+*.keystore
+*.jks
+*.p12
+*.pem
+.env
