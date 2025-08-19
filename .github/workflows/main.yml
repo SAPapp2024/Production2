@@ -1,0 +1,87 @@
+name: Backfill (JSON secret, autodetect)
+
+on:
+  workflow_dispatch: {}
+  # push:
+  #   branches: [ "feature/**" ]
+
+permissions:
+  contents: read
+
+jobs:
+  backfill:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Show repo layout (debug)
+        run: |
+          pwd
+          ls -la
+          echo "---- root package.json ----"
+          [ -f package.json ] && cat package.json || echo "no root package.json"
+          echo "---- scripts dir ----"
+          ls -la scripts || true
+          echo "---- search for backfill.ts ----"
+          (git ls-files | grep -E '(^|/)(backfill\.ts|backfill\.js)$') || true
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Write service account key to disk
+        run: |
+          cat > "$RUNNER_TEMP/sa.json" <<'JSON'
+          ${{ secrets.GOOGLE_CREDENTIALS }}
+          JSON
+          node -e "JSON.parse(require('fs').readFileSync(process.env.RUNNER_TEMP+'/sa.json','utf8')); console.log('Key JSON parsed OK')"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$RUNNER_TEMP/sa.json" >> $GITHUB_ENV
+
+      - name: Detect backfill script path
+        id: detect
+        run: |
+          set -e
+          # Try common locations
+          for p in "scripts/backfill.ts" "backfill.ts" "scripts/backfill.js" "backfill.js"; do
+            if [ -f "$p" ]; then
+              echo "path=$p" >> "$GITHUB_OUTPUT"
+              echo "Detected backfill at: $p"
+              exit 0
+            fi
+          done
+          echo "ERROR: Could not find backfill.ts or backfill.js in repo root or scripts/." >&2
+          echo "TIP: rename/move your script or update this workflow's detection list."
+          exit 1
+
+      - name: Install deps (root or scripts subfolder)
+        run: |
+          set -e
+          # If there's a scripts/package.json, install there; otherwise install at root
+          if [ -f scripts/package.json ]; then
+            echo "Installing in scripts/"
+            if [ -f scripts/package-lock.json ]; then npm ci --prefix scripts; else npm install --prefix scripts; fi
+          elif [ -f package.json ]; then
+            echo "Installing in repo root"
+            if [ -f package-lock.json ]; then npm ci; else npm install; fi
+          else
+            echo "ERROR: No package.json found (root or scripts/). Add one so we can install deps." >&2
+            exit 1
+          fi
+
+      - name: Run backfill (TS/JS)
+        env:
+          DRY_RUN: "true"   # flip to "false" after verifying
+        run: |
+          set -e
+          SCRIPT="${{ steps.detect.outputs.path }}"
+          case "$SCRIPT" in
+            *.ts)
+              # prefer local ts-node if installed under scripts/, else fallback to root
+              if [ -f scripts/package.json ]; then npx --prefix scripts ts-node --transpile-only "$SCRIPT"; else npx ts-node --transpile-only "$SCRIPT"; fi
+              ;;
+            *.js)
+              node "$SCRIPT"
+              ;;
+          esac
