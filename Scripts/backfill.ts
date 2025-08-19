@@ -1,6 +1,12 @@
 import * as admin from "firebase-admin";
 import { FieldPath, Timestamp } from "firebase-admin/firestore";
 import * as path from "path";
+import * as admin from "firebase-admin";
+
+if (admin.apps.length === 0) {
+  admin.initializeApp({ credential: admin.credential.applicationDefault() });
+}
+
 
 // ── Init (choose ONE of the two) ───────────────────────────────────────────────
 // A) Service account JSON in this folder (recommended for prod)
