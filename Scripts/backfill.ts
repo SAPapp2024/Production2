@@ -1,34 +1,22 @@
 import * as admin from "firebase-admin";
 import { FieldPath, Timestamp } from "firebase-admin/firestore";
-import * as path from "path";
-import * as admin from "firebase-admin";
 
+// Single init: use ADC (picked up from GOOGLE_APPLICATION_CREDENTIALS)
 if (admin.apps.length === 0) {
-  admin.initializeApp({ credential: admin.credential.applicationDefault() });
+  admin.initializeApp({
+    credential: admin.credential.applicationDefault(),
+    // storageBucket: "agro-k-c5da2.appspot.com", // uncomment if you use Storage ops
+  });
 }
-
-
-// ── Init (choose ONE of the two) ───────────────────────────────────────────────
-// A) Service account JSON in this folder (recommended for prod)
-const SERVICE_ACCOUNT_PATH = path.join(__dirname, "serviceAccountKeyProd.json");
-admin.initializeApp({
-  credential: admin.credential.cert(require(SERVICE_ACCOUNT_PATH)),
-});
-
-// // B) Or use GOOGLE_APPLICATION_CREDENTIALS env var (uncomment for this)
-// // admin.initializeApp({ credential: admin.credential.applicationDefault() });
-// ───────────────────────────────────────────────────────────────────────────────
 
 const db = admin.firestore();
 
-// Config via env vars (PowerShell: $env:NAME="value")
+// Config via env vars
 const COLLECTION = process.env.COLLECTION || "samples";
 const DRY_RUN = (process.env.DRY_RUN || "false").toLowerCase() === "true";
-const LIMIT = Number(process.env.LIMIT || "0"); // global cap (# docs processed); 0 = no cap
-
-// Pagination constants
+const LIMIT = Number(process.env.LIMIT || "0"); // 0 = no cap
 const PAGE_SIZE = Number(process.env.PAGE_SIZE || "400"); // <= 500 recommended
-const BATCH_SIZE = 400; // commit every 400 writes
+const BATCH_SIZE = 400;
 
 function looksLikeMidnight(ts: Timestamp | undefined) {
   if (!ts) return true;
@@ -80,7 +68,7 @@ async function processPage(
 
       updates["createdDate"] = fallback;
       if (hasTimestamp && !data["createdDateDMY"]) {
-        // preserve old day-only value (optional)
+        // Optional: keep legacy date-only value
         updates["createdDateDMY"] = created;
       }
     }
@@ -100,9 +88,7 @@ async function processPage(
       }
     }
 
-    if (LIMIT && processed >= (remaining || LIMIT)) {
-      break;
-    }
+    if (LIMIT && processed >= (remaining || LIMIT)) break;
   }
 
   if (!DRY_RUN && enqueued % BATCH_SIZE !== 0) {
@@ -123,10 +109,7 @@ async function main() {
   let remaining = LIMIT || undefined;
 
   while (true) {
-    const { lastId: newLast, processed, updated } = await processPage(
-      lastId,
-      remaining
-    );
+    const { lastId: newLast, processed, updated } = await processPage(lastId, remaining);
     if (processed === 0) break;
 
     totalProcessed += processed;
