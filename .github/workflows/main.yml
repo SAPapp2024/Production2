@@ -21,8 +21,8 @@ jobs:
           ls -la
           echo "---- root package.json ----"
           [ -f package.json ] && cat package.json || echo "no root package.json"
-          echo "---- scripts dir ----"
-          ls -la scripts || true
+          echo "---- Scripts dir ----"
+          ls -la Scripts || true
           echo "---- search for backfill.ts ----"
           (git ls-files | grep -E '(^|/)(backfill\.ts|backfill\.js)$') || true
 
@@ -44,29 +44,29 @@ jobs:
         run: |
           set -e
           # Try common locations
-          for p in "scripts/backfill.ts" "backfill.ts" "scripts/backfill.js" "backfill.js"; do
+          for p in "Scripts/backfill.ts" "backfill.ts" "Scripts/backfill.js" "backfill.js"; do
             if [ -f "$p" ]; then
               echo "path=$p" >> "$GITHUB_OUTPUT"
               echo "Detected backfill at: $p"
               exit 0
             fi
           done
-          echo "ERROR: Could not find backfill.ts or backfill.js in repo root or scripts/." >&2
+          echo "ERROR: Could not find backfill.ts or backfill.js in repo root or Scripts/." >&2
           echo "TIP: rename/move your script or update this workflow's detection list."
           exit 1
 
-      - name: Install deps (root or scripts subfolder)
+      - name: Install deps (root or Scripts subfolder)
         run: |
           set -e
-          # If there's a scripts/package.json, install there; otherwise install at root
-          if [ -f scripts/package.json ]; then
-            echo "Installing in scripts/"
-            if [ -f scripts/package-lock.json ]; then npm ci --prefix scripts; else npm install --prefix scripts; fi
+          # If there's a Scripts/package.json, install there; otherwise install at root
+          if [ -f Scripts/package.json ]; then
+            echo "Installing in Scripts/"
+            if [ -f Scripts/package-lock.json ]; then npm ci --prefix Scripts; else npm install --prefix Scripts; fi
           elif [ -f package.json ]; then
             echo "Installing in repo root"
             if [ -f package-lock.json ]; then npm ci; else npm install; fi
           else
-            echo "ERROR: No package.json found (root or scripts/). Add one so we can install deps." >&2
+            echo "ERROR: No package.json found (root or Scripts/). Add one so we can install deps." >&2
             exit 1
           fi
 
@@ -78,8 +78,8 @@ jobs:
           SCRIPT="${{ steps.detect.outputs.path }}"
           case "$SCRIPT" in
             *.ts)
-              # prefer local ts-node if installed under scripts/, else fallback to root
-              if [ -f scripts/package.json ]; then npx --prefix scripts ts-node --transpile-only "$SCRIPT"; else npx ts-node --transpile-only "$SCRIPT"; fi
+              # prefer local ts-node if installed under Scripts/, else fallback to root
+              if [ -f Scripts/package.json ]; then npx --prefix Scripts ts-node --transpile-only "$SCRIPT"; else npx ts-node --transpile-only "$SCRIPT"; fi
               ;;
             *.js)
               node "$SCRIPT"
