@@ -4,7 +4,9 @@ import { FieldPath, Timestamp } from "firebase-admin/firestore";
 // Single init: use ADC (picked up from GOOGLE_APPLICATION_CREDENTIALS)
 if (admin.apps.length === 0) {
   admin.initializeApp({
-    credential: admin.credential.applicationDefault(),
+    credential: gac && fs.existsSync(gac)
+      ? admin.credential.cert(JSON.parse(fs.readFileSync(gac, "utf8")))
+      : admin.credential.applicationDefault(),
     // storageBucket: "agro-k-c5da2.appspot.com", // uncomment if you use Storage ops
   });
 }
