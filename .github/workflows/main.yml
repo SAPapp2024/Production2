@@ -34,8 +34,8 @@ jobs:
           GCP_PROJECT: ${{ vars.GCP_PROJECT }}
         run: |
           set -e
-          SCRIPT="Scripts/backfill.ts"
-          npx --prefix Scripts ts-node --transpile-only "$SCRIPT"
+          # Run Node and preload ts-node from Scripts/, avoids executing a bin
+          node -r ./Scripts/node_modules/ts-node/register/transpile-only ./Scripts/backfill.ts
 
       - name: Setup Node
         uses: actions/setup-node@v4
