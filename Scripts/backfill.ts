@@ -1,137 +1,52 @@
-import * as admin from "firebase-admin";
-import { FieldPath, Timestamp } from "firebase-admin/firestore";
+// Scripts/backfill.ts
+import * as fs from 'fs';
+import * as admin from 'firebase-admin';
 
-// Single init: use ADC (picked up from GOOGLE_APPLICATION_CREDENTIALS)
-if (admin.apps.length === 0) {
-  admin.initializeApp({
-    credential: gac && fs.existsSync(gac)
-      ? admin.credential.cert(JSON.parse(fs.readFileSync(gac, "utf8")))
-      : admin.credential.applicationDefault(),
-    // storageBucket: "agro-k-c5da2.appspot.com", // uncomment if you use Storage ops
-  });
-}
+function getCredential(): admin.credential.Credential {
+  // 1) If you store the whole service account JSON in a secret (plain JSON or base64)
+  const saEnv =
+    process.env.FIREBASE_SERVICE_ACCOUNT ||
+    process.env.FIREBASE_SERVICE_ACCOUNT_BASE64;
 
-const db = admin.firestore();
-
-// Config via env vars
-const COLLECTION = process.env.COLLECTION || "samples";
-const DRY_RUN = (process.env.DRY_RUN || "false").toLowerCase() === "true";
-const LIMIT = Number(process.env.LIMIT || "0"); // 0 = no cap
-const PAGE_SIZE = Number(process.env.PAGE_SIZE || "400"); // <= 500 recommended
-const BATCH_SIZE = 400;
-
-function looksLikeMidnight(ts: Timestamp | undefined) {
-  if (!ts) return true;
-  const d = ts.toDate();
-  return d.getHours() === 0 && d.getMinutes() === 0 && d.getSeconds() === 0;
-}
-
-async function processPage(
-  startAfterId?: string,
-  remaining?: number
-): Promise<{ lastId?: string; processed: number; updated: number }> {
-  let q = db
-    .collection(COLLECTION)
-    .orderBy(FieldPath.documentId())
-    .limit(remaining && remaining > 0 ? Math.min(PAGE_SIZE, remaining) : PAGE_SIZE);
-
-  if (startAfterId) q = q.startAfter(startAfterId);
-
-  const snap = await q.get();
-  if (snap.empty) return { processed: 0, updated: 0 };
-
-  let batch = db.batch();
-  let enqueued = 0;
-  let processed = 0;
-  let updated = 0;
-  let lastId: string | undefined;
-
-  for (const doc of snap.docs) {
-    processed++;
-    lastId = doc.id;
-    const data = doc.data() || {};
-    const updates: Record<string, any> = {};
-
-    // 1) userUid ← userReference.id (if missing)
-    const userRef = data["userReference"];
-    if (!data["userUid"] && userRef && typeof userRef.id === "string") {
-      updates["userUid"] = userRef.id;
-    }
-
-    // 2) createdDate ← real timestamp (if missing OR date-only midnight)
-    const created = data["createdDate"] as Timestamp | undefined;
-    const hasTimestamp = created instanceof Timestamp;
-
-    if (!hasTimestamp || looksLikeMidnight(created)) {
-      const fallback =
-        (doc.createTime as Timestamp) ||
-        (doc.updateTime as Timestamp) ||
-        Timestamp.now();
-
-      updates["createdDate"] = fallback;
-      if (hasTimestamp && !data["createdDateDMY"]) {
-        // Optional: keep legacy date-only value
-        updates["createdDateDMY"] = created;
-      }
-    }
-
-    if (Object.keys(updates).length > 0) {
-      updated++;
-      if (DRY_RUN) {
-        console.log(`[DRY_RUN] ${doc.id}`, updates);
-      } else {
-        batch.update(doc.ref, updates);
-        enqueued++;
-        if (enqueued % BATCH_SIZE === 0) {
-          await batch.commit();
-          console.log(`Committed ${enqueued} updates in this page...`);
-          batch = db.batch();
-        }
-      }
-    }
-
-    if (LIMIT && processed >= (remaining || LIMIT)) break;
+  if (saEnv) {
+    const jsonStr = saEnv.trim().startsWith('{')
+      ? saEnv
+      : Buffer.from(saEnv, 'base64').toString('utf8');
+    const keyObj = JSON.parse(jsonStr);
+    return admin.credential.cert(keyObj as admin.ServiceAccount);
   }
 
-  if (!DRY_RUN && enqueued % BATCH_SIZE !== 0) {
-    await batch.commit();
+  // 2) If GOOGLE_APPLICATION_CREDENTIALS points to a key file or WIF token file
+  const gac = process.env.GOOGLE_APPLICATION_CREDENTIALS;
+  if (gac && fs.existsSync(gac)) {
+    return admin.credential.applicationDefault();
   }
 
-  return { lastId, processed, updated };
+  // 3) Fall back to ADC (e.g., Workload Identity Federation) if set by the environment
+  return admin.credential.applicationDefault();
 }
 
-async function main() {
-  console.log(
-    `Starting backfill on '${COLLECTION}' | DRY_RUN=${DRY_RUN} | LIMIT=${LIMIT || "none"}`
+function getProjectId(): string | undefined {
+  return (
+    process.env.GCP_PROJECT ||
+    process.env.GOOGLE_CLOUD_PROJECT ||
+    // If FIREBASE_CONFIG is present (from Firebase Hosting/Functions), try to extract projectId
+    process.env.FIREBASE_CONFIG?.match(/"projectId":"([^"]+)"/)?.[1]
   );
-
-  let totalProcessed = 0;
-  let totalUpdated = 0;
-  let lastId: string | undefined = undefined;
-  let remaining = LIMIT || undefined;
-
-  while (true) {
-    const { lastId: newLast, processed, updated } = await processPage(lastId, remaining);
-    if (processed === 0) break;
-
-    totalProcessed += processed;
-    totalUpdated += updated;
-    lastId = newLast;
-
-    if (remaining) {
-      remaining -= processed;
-      if (remaining <= 0) break;
-    }
-
-    console.log(
-      `Page done. processed=${processed}, updated=${updated}, totalProcessed=${totalProcessed}, totalUpdated=${totalUpdated}`
-    );
-  }
-
-  console.log(`✅ Finished. totalProcessed=${totalProcessed}, totalUpdated=${totalUpdated}`);
 }
 
-main().catch((e) => {
-  console.error(e);
-  process.exit(1);
+admin.initializeApp({
+  credential: getCredential(),
+  projectId: getProjectId(),
 });
+
+(async () => {
+  try {
+    const cols = await admin.firestore().listCollections();
+    console.log('OK collections:', cols.length);
+    process.exit(0);
+  } catch (e: any) {
+    console.error('ERROR:', e?.message || e);
+    process.exit(1);
+  }
+})();
