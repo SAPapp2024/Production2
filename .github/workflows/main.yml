@@ -55,15 +55,14 @@ jobs:
         id: detect
         run: echo "path=Scripts/backfill.ts" >> "$GITHUB_OUTPUT"
 
-      # ✅ Verify the file exists (case-sensitive path!) and show its first lines
       - name: Verify backfill.ts path and print header
         shell: bash
         run: |
           set -e
           echo "PWD: $(pwd)"
-          test -f Scripts/backfill.ts || { echo "MISSING: Scripts/backfill.ts (did you mean 'Scripts' not 'Scrips'?)"; find . -maxdepth 3 -type f -name 'backfill.ts'; exit 1; }
+          test -f Scripts/backfill.ts || { echo "MISSING: Scripts/backfill.ts"; find . -maxdepth 3 -type f -name 'backfill.ts'; exit 1; }
           sed -n '1,60p' Scripts/backfill.ts
-
+      
       - name: Run backfill (TS/JS)
         shell: bash
         env:
