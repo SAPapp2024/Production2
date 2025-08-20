@@ -13,7 +13,7 @@ function getCredential(): admin.credential.Credential {
   return admin.credential.applicationDefault();
 }
 
-ffunction getProjectId(): string | undefined {
+function getProjectId(): string | undefined {
    // 1) Obvious envs first
    const direct =
      process.env.GCP_PROJECT ||
