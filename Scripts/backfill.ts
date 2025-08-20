@@ -15,8 +15,7 @@ function getCredential(): admin.credential.Credential {
   const extPath = process.env.GOOGLE_GHA_CREDS_PATH || process.env.GOOGLE_APPLICATION_CREDENTIALS;
   if (extPath && fs.existsSync(extPath)) {
     const scopes = ['https://www.googleapis.com/auth/datastore']; // minimal scope for Firestore
-    // IMPORTANT: point GoogleAuth explicitly at the external_account file,
-    // then clear env vars so firebase-admin won't try to parse that file itself.
+    // Point GoogleAuth at the external_account file, then clear env so Admin won't parse it directly.
     const auth = new GoogleAuth({ keyFilename: extPath, scopes });
     delete process.env.GOOGLE_APPLICATION_CREDENTIALS;
     delete process.env.GOOGLE_GHA_CREDS_PATH;
@@ -37,7 +36,6 @@ function getCredential(): admin.credential.Credential {
 }
 
 function getProjectId(): string | undefined {
-  // Prefer explicit envs
   const direct =
     process.env.GCP_PROJECT ||
     process.env.GOOGLE_CLOUD_PROJECT ||
@@ -45,7 +43,6 @@ function getProjectId(): string | undefined {
     process.env.FIREBASE_CONFIG?.match(/"projectId":"([^"]+)"/)?.[1];
   if (direct) return direct;
 
-  // Last-ditch: read project_id/quota_project_id from the creds file if present
   const p = process.env.GOOGLE_APPLICATION_CREDENTIALS;
   if (p && fs.existsSync(p)) {
     try {
