@@ -28,46 +28,28 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'npm'
+          # cache removed to avoid "lock file not found" error
 
-      # (Optional) Google auth if you use Workload Identity Federation
-      # - name: Auth to Google Cloud (optional)
-      #   uses: google-github-actions/auth@v2
-      #   with:
-      #     workload_identity_provider: ${{ secrets.GCP_WIF_PROVIDER }}
-      #     service_account: ${{ secrets.GCP_SA_EMAIL }}
-
-      - name: Install deps
-        run: npm ci
-
-      # If your TS script lives under Scripts/ and has its own package.json,
-      # it prefers that ts-node; otherwise falls back to root ts-node.
-      - name: Detect script
-        id: detect
-        run: echo "path=Scripts/backfill.ts" >> "$GITHUB_OUTPUT"
-
-      - name: Run backfill (TS/JS)
+      - name: Install deps (root or Scripts/)
         shell: bash
         run: |
           set -e
-          SCRIPT="${{ steps.detect.outputs.path }}"
-          case "$SCRIPT" in
-            *.ts)
-              # prefer local ts-node if installed under Scripts/, else fallback to root
-              if [ -f Scripts/package.json ]; then
-                npx --prefix Scripts ts-node --transpile-only "$SCRIPT"
-              else
-                npx ts-node --transpile-only "$SCRIPT"
-              fi
-              ;;
-            *.js)
-              node "$SCRIPT"
-              ;;
-          esac
-        env:
-          # If you use a service account JSON in a secret (raw or base64), expose it here:
-          # FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
-          # Or set project explicitly if needed:
-          # GCP_PROJECT: your-project-id
-          # GOOGLE_APPLICATION_CREDENTIALS is set automatically by google-github-actions/auth if used
-          NODE_OPTIONS: --enable-source-maps
+          if [ -f package.json ]; then
+            if [ -f package-lock.json ] || [ -f npm-shrinkwrap.json ]; then
+              npm ci
+            else
+              npm install --no-audit --no-fund
+            fi
+          elif [ -f Scripts/package.json ]; then
+            if [ -f Scripts/package-lock.json ]; then
+              npm ci --prefix Scripts
+            else
+              npm install --prefix Scripts --no-audit --no-fund
+            fi
+          else
+            echo "No package.json found in repo root or Scripts/; nothing to install."
+          fi
+
+      - name: Detect script
+        id: detect
+        run: echo "path=Scripts/backfi
