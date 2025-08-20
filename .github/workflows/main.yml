@@ -1,4 +1,4 @@
-# .github/workflows/backfill.yml  (filename can be main.yml if you prefer)
+# .github/workflows/main.yml
 name: Backfill
 on:
   workflow_dispatch:
@@ -9,7 +9,7 @@ jobs:
 
     permissions:
       contents: read
-      id-token: write  # required if you later enable google-github-actions/auth (WIF)
+      id-token: write   # required for OIDC
 
     steps:
       - name: Checkout
@@ -17,7 +17,6 @@ jobs:
         with:
           submodules: false
 
-      # 🔧 Cleanup: remove stale submodule metadata & config (temporary; safe no-ops if absent)
       - name: Clear stale submodule metadata (temporary)
         run: |
           rm -rf .git/modules/depot_tools || true
@@ -27,31 +26,30 @@ jobs:
       - name: Auth to Google Cloud (WIF)
         uses: google-github-actions/auth@v2
         with:
-          workload_identity_provider: ${{ secrets.GCP_WIF_PROVIDER }}  # provider path: projects/.../providers/<name>
-          service_account: ${{ secrets.GCP_SA_EMAIL }}                 # gh-ci-sa@agro-k-c5da2.iam.gserviceaccount.com
-          project_id: ${{ vars.GCP_PROJECT }}                          # agro-k-c5da2
+          workload_identity_provider: ${{ secrets.GCP_WIF_PROVIDER }}
+          service_account: ${{ secrets.GCP_SA_EMAIL }}
+          project_id: ${{ vars.GCP_PROJECT }}
 
-     - name: Setup Node
+      - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          # no cache until a lockfile exists
 
       - name: Install deps (root or Scripts/)
         shell: bash
         run: |
           set -e
-          if [ -f package.json ]; then
-            if [ -f package-lock.json ] || [ -f npm-shrinkwrap.json ]; then
-              npm ci
-            else
-              npm install --no-audit --no-fund
-            fi
-          elif [ -f Scripts/package.json ]; then
+          if [ -f Scripts/package.json ]; then
             if [ -f Scripts/package-lock.json ]; then
               npm ci --prefix Scripts
             else
               npm install --prefix Scripts --no-audit --no-fund
+            fi
+          elif [ -f package.json ]; then
+            if [ -f package-lock.json ] || [ -f npm-shrinkwrap.json ]; then
+              npm ci
+            else
+              npm install --no-audit --no-fund
             fi
           else
             echo "No package.json found in repo root or Scripts/; nothing to install."
@@ -65,9 +63,7 @@ jobs:
         shell: bash
         env:
           NODE_OPTIONS: --enable-source-maps
-          GCP_PROJECT: ${{ vars.GCP_PROJECT }}     # 👈 ensure your TS sees the project
-          # If you use a service account JSON instead of WIF, uncomment:
-          # FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          GCP_PROJECT: ${{ vars.GCP_PROJECT }}
         run: |
           set -e
           SCRIPT="${{ steps.detect.outputs.path }}"
@@ -83,10 +79,3 @@ jobs:
               node "$SCRIPT"
               ;;
           esac
-
-      # Optional: enable keyless Google auth (Workload Identity Federation)
-      # - name: Auth to Google Cloud (optional)
-      #   uses: google-github-actions/auth@v2
-      #   with:
-      #     workload_identity_provider: ${{ secrets.GCP_WIF_PROVIDER }}
-      #     service_account: ${{ secrets.GCP_SA_EMAIL }}
