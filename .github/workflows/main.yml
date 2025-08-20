@@ -28,6 +28,15 @@ jobs:
           service_account: ${{ secrets.GCP_SA_EMAIL }}
           project_id: ${{ vars.GCP_PROJECT }}
 
+      - name: Run backfill (TS/JS)
+        env:
+          NODE_OPTIONS: --enable-source-maps
+          GCP_PROJECT: ${{ vars.GCP_PROJECT }}
+        run: |
+          set -e
+          SCRIPT="Scripts/backfill.ts"
+          npx --prefix Scripts ts-node --transpile-only "$SCRIPT"
+
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
@@ -62,22 +71,3 @@ jobs:
           echo "PWD: $(pwd)"
           test -f Scripts/backfill.ts || { echo "MISSING: Scripts/backfill.ts"; find . -maxdepth 3 -type f -name 'backfill.ts'; exit 1; }
           sed -n '1,60p' Scripts/backfill.ts
-      
-      - name: Run backfill (TS/JS)
-        shell: bash
-        env:
-          NODE_OPTIONS: --enable-source-maps
-          GCP_PROJECT: ${{ vars.GCP_PROJECT }}
-        run: |
-          set -e
-          SCRIPT="${{ steps.detect.outputs.path }}"
-          case "$SCRIPT" in
-            *.ts)
-              if [ -f Scripts/package.json ]; then
-                npx --prefix Scripts ts-node --transpile-only "$SCRIPT"
-              else
-                npx ts-node --transpile-only "$SCRIPT"
-              fi
-              ;;
-            *.js) node "$SCRIPT" ;;
-          esac
