@@ -8,9 +8,9 @@
     "typescript": "^5.5.4"
   },
   "dependencies": {
-    "@google-cloud/firestore": "^7.10.0"
+    "firebase-admin": "^12.5.0"
   },
   "scripts": {
-    "backfill": "ts-node --transpile-only Scripts/backfill.ts"
+    "backfill": "node -r ./Scripts/node_modules/ts-node/register/transpile-only ./Scripts/backfill.ts"
   }
 }
