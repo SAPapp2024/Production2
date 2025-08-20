@@ -17,9 +17,12 @@ jobs:
         with:
           submodules: false
 
-      # 🔧 Cleanup: remove stale submodule metadata so post-job doesn't fail
+      # 🔧 Cleanup: remove stale submodule metadata & config (temporary)
       - name: Clear stale submodule metadata (temporary)
-        run: rm -rf .git/modules/depot_tools || true
+        run: |
+          rm -rf .git/modules/depot_tools || true
+          git config -f .gitmodules --remove-section submodule.depot_tools || true
+          git config --local --remove-section submodule.depot_tools || true
 
       - name: Setup Node
         uses: actions/setup-node@v4
