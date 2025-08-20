@@ -1,18 +1,16 @@
 {
   "name": "scripts",
-  "version": "1.0.0",
   "private": true,
   "type": "commonjs",
-  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^20.14.2",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.5.4"
+  },
   "dependencies": {
     "firebase-admin": "^12.5.0"
   },
-  "devDependencies": {
-    "ts-node": "^10.9.2",
-    "typescript": "^5.6.2",
-    "@types/node": "^20.11.30"
-  },
   "scripts": {
-    "backfill": "ts-node backfill.ts"
+    "backfill": "ts-node --transpile-only Scripts/backfill.ts"
   }
 }

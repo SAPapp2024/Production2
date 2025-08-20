@@ -2,25 +2,14 @@
 import * as fs from 'fs';
 import * as admin from 'firebase-admin';
 
-const saEnv = process.env.FIREBASE_SERVICE_ACCOUNT || process.env.FIREBASE_SERVICE_ACCOUNT_BASE64;
-const gac = process.env.GOOGLE_APPLICATION_CREDENTIALS;
-
 function getCredential(): admin.credential.Credential {
-  // If a service-account JSON is provided via env (raw or base64), use it
+  const saEnv = process.env.FIREBASE_SERVICE_ACCOUNT || process.env.FIREBASE_SERVICE_ACCOUNT_BASE64;
   if (saEnv) {
-    const jsonStr = saEnv.trim().startsWith('{')
-      ? saEnv
-      : Buffer.from(saEnv, 'base64').toString('utf8');
-    const keyObj = JSON.parse(jsonStr);
-    return admin.credential.cert(keyObj as admin.ServiceAccount);
+    const jsonStr = saEnv.trim().startsWith('{') ? saEnv : Buffer.from(saEnv, 'base64').toString('utf8');
+    return admin.credential.cert(JSON.parse(jsonStr) as admin.ServiceAccount);
   }
-
-  // If GAC points to a file (e.g. set by google-github-actions/auth), use ADC
-  if (gac && fs.existsSync(gac)) {
-    return admin.credential.applicationDefault();
-  }
-
-  // Fallback to ADC (WIF or gcloud on runners/dev machines)
+  const gac = process.env.GOOGLE_APPLICATION_CREDENTIALS;
+  if (gac && fs.existsSync(gac)) return admin.credential.applicationDefault();
   return admin.credential.applicationDefault();
 }
 
@@ -60,10 +49,7 @@ ffunction getProjectId(): string | undefined {
  }
 
 
-admin.initializeApp({
-  credential: getCredential(),
-  projectId: getProjectId(),
-});
+admin.initializeApp({ credential: getCredential(), projectId: getProjectId() });
 
 (async () => {
   try {
