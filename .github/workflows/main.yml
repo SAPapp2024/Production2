@@ -1,4 +1,4 @@
-# .github/workflows/backfill.yml
+# .github/workflows/backfill.yml  (filename can be main.yml if you prefer)
 name: Backfill
 on:
   workflow_dispatch:
@@ -9,7 +9,7 @@ jobs:
 
     permissions:
       contents: read
-      id-token: write  # keep if you use google-github-actions/auth (WIF)
+      id-token: write  # required if you later enable google-github-actions/auth (WIF)
 
     steps:
       - name: Checkout
@@ -17,7 +17,7 @@ jobs:
         with:
           submodules: false
 
-      # 🔧 Cleanup: remove stale submodule metadata & config (temporary)
+      # 🔧 Cleanup: remove stale submodule metadata & config (temporary; safe no-ops if absent)
       - name: Clear stale submodule metadata (temporary)
         run: |
           rm -rf .git/modules/depot_tools || true
@@ -28,7 +28,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          # cache removed to avoid "lock file not found" error
+          # no cache until a lockfile exists
 
       - name: Install deps (root or Scripts/)
         shell: bash
@@ -52,4 +52,36 @@ jobs:
 
       - name: Detect script
         id: detect
-        run: echo "path=Scripts/backfi
+        run: echo "path=Scripts/backfill.ts" >> "$GITHUB_OUTPUT"
+
+      - name: Run backfill (TS/JS)
+        shell: bash
+        env:
+          NODE_OPTIONS: --enable-source-maps
+          # If using a service account JSON (raw or base64), uncomment:
+          # FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          # Optionally force project (helps avoid mismatch):
+          # GCP_PROJECT: your-project-id
+          # If you add google-github-actions/auth later, it'll set GOOGLE_APPLICATION_CREDENTIALS automatically (ADC).
+        run: |
+          set -e
+          SCRIPT="${{ steps.detect.outputs.path }}"
+          case "$SCRIPT" in
+            *.ts)
+              if [ -f Scripts/package.json ]; then
+                npx --prefix Scripts ts-node --transpile-only "$SCRIPT"
+              else
+                npx ts-node --transpile-only "$SCRIPT"
+              fi
+              ;;
+            *.js)
+              node "$SCRIPT"
+              ;;
+          esac
+
+      # Optional: enable keyless Google auth (Workload Identity Federation)
+      # - name: Auth to Google Cloud (optional)
+      #   uses: google-github-actions/auth@v2
+      #   with:
+      #     workload_identity_provider: ${{ secrets.GCP_WIF_PROVIDER }}
+      #     service_account: ${{ secrets.GCP_SA_EMAIL }}
