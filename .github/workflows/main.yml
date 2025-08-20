@@ -29,6 +29,13 @@ jobs:
         with:
           node-version: '20'
           # no cache until a lockfile exists
+      - name: Auth to Google Cloud (WIF)
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WIF_PROVIDER }}  # provider path: projects/.../providers/<name>
+          service_account: ${{ secrets.GCP_SA_EMAIL }}                 # gh-ci-sa@agro-k-c5da2.iam.gserviceaccount.com
+          project_id: ${{ vars.GCP_PROJECT }}                          # agro-k-c5da2
+    
 
       - name: Install deps (root or Scripts/)
         shell: bash
