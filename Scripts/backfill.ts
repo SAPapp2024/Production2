@@ -4,63 +4,67 @@ import * as admin from 'firebase-admin';
 import { GoogleAuth } from 'google-auth-library';
 
 function getCredential(): admin.credential.Credential {
-  // 1) Service-account JSON via env (raw or base64)
+  // Option A: service-account JSON provided via secret (raw or base64)
   const saEnv = process.env.FIREBASE_SERVICE_ACCOUNT || process.env.FIREBASE_SERVICE_ACCOUNT_BASE64;
   if (saEnv) {
     const jsonStr = saEnv.trim().startsWith('{') ? saEnv : Buffer.from(saEnv, 'base64').toString('utf8');
     return admin.credential.cert(JSON.parse(jsonStr) as admin.ServiceAccount);
   }
 
-  // 2) GitHub WIF path present → use google-auth-library to mint tokens
-  //    (Works with the external_account file created by google-github-actions/auth@v2)
-  if (process.env.GOOGLE_GHA_CREDS_PATH || process.env.GOOGLE_APPLICATION_CREDENTIALS) {
+  // Option B: GitHub WIF external_account file (from auth@v2)
+  const extPath = process.env.GOOGLE_GHA_CREDS_PATH || process.env.GOOGLE_APPLICATION_CREDENTIALS;
+  if (extPath && fs.existsSync(extPath)) {
     const scopes = ['https://www.googleapis.com/auth/datastore']; // minimal scope for Firestore
-    const auth = new GoogleAuth({ scopes });
+    // IMPORTANT: point GoogleAuth explicitly at the external_account file,
+    // then clear env vars so firebase-admin won't try to parse that file itself.
+    const auth = new GoogleAuth({ keyFilename: extPath, scopes });
+    delete process.env.GOOGLE_APPLICATION_CREDENTIALS;
+    delete process.env.GOOGLE_GHA_CREDS_PATH;
 
-    // Firebase Admin accepts any object implementing getAccessToken()
     return {
       getAccessToken: async () => {
         const client = await auth.getClient();
         const tok = await client.getAccessToken();
         const access_token = typeof tok === 'string' ? tok : (tok as any)?.token;
         if (!access_token) throw new Error('Unable to obtain access token from WIF credentials');
-        // expires_in is advisory; Admin will refresh when needed
         return { access_token, expires_in: 3600 };
       },
     } as unknown as admin.credential.Credential;
   }
 
-  // 3) Fallback to ADC (gcloud/dev box)
+  // Option C: local dev (gcloud ADC)
   return admin.credential.applicationDefault();
 }
 
 function getProjectId(): string | undefined {
-  return (
+  // Prefer explicit envs
+  const direct =
     process.env.GCP_PROJECT ||
     process.env.GOOGLE_CLOUD_PROJECT ||
     process.env.GCLOUD_PROJECT ||
-    process.env.FIREBASE_CONFIG?.match(/"projectId":"([^"]+)"/)?.[1] ||
-    // Try reading project_id from the WIF/ADC file if present
-    (() => {
-      const p = process.env.GOOGLE_APPLICATION_CREDENTIALS;
-      if (p && fs.existsSync(p)) {
-        try {
-          const obj = JSON.parse(fs.readFileSync(p, 'utf8'));
-          return (obj.project_id || obj.quota_project_id) as string | undefined;
-        } catch {}
-      }
-      return undefined;
-    })()
-  );
+    process.env.FIREBASE_CONFIG?.match(/"projectId":"([^"]+)"/)?.[1];
+  if (direct) return direct;
+
+  // Last-ditch: read project_id/quota_project_id from the creds file if present
+  const p = process.env.GOOGLE_APPLICATION_CREDENTIALS;
+  if (p && fs.existsSync(p)) {
+    try {
+      const obj = JSON.parse(fs.readFileSync(p, 'utf8'));
+      return (obj.project_id || obj.quota_project_id) as string | undefined;
+    } catch {}
+  }
+  return undefined;
 }
 
 const projectId = getProjectId();
+console.log('Project:', projectId ?? '(none)');
+
 admin.initializeApp({ credential: getCredential(), projectId });
 
 (async () => {
   try {
     const cols = await admin.firestore().listCollections();
-    console.log('OK collections:', cols.length, 'project:', projectId ?? '(none)');
+    console.log('OK collections:', cols.length);
     process.exit(0);
   } catch (e: any) {
     console.error('ERROR:', e?.message || e);
