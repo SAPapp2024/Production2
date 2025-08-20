@@ -8,8 +8,7 @@
     "typescript": "^5.5.4"
   },
   "dependencies": {
-    "firebase-admin": "^12.5.0",
-    "google-auth-library": "^9.14.1"
+    "@google-cloud/firestore": "^7.10.0"
   },
   "scripts": {
     "backfill": "ts-node --transpile-only Scripts/backfill.ts"
