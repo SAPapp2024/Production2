@@ -24,18 +24,18 @@ jobs:
           git config -f .gitmodules --remove-section submodule.depot_tools || true
           git config --local --remove-section submodule.depot_tools || true
 
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          # no cache until a lockfile exists
       - name: Auth to Google Cloud (WIF)
         uses: google-github-actions/auth@v2
         with:
           workload_identity_provider: ${{ secrets.GCP_WIF_PROVIDER }}  # provider path: projects/.../providers/<name>
           service_account: ${{ secrets.GCP_SA_EMAIL }}                 # gh-ci-sa@agro-k-c5da2.iam.gserviceaccount.com
           project_id: ${{ vars.GCP_PROJECT }}                          # agro-k-c5da2
-    
+
+     - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          # no cache until a lockfile exists
 
       - name: Install deps (root or Scripts/)
         shell: bash
@@ -65,11 +65,9 @@ jobs:
         shell: bash
         env:
           NODE_OPTIONS: --enable-source-maps
-          # If using a service account JSON (raw or base64), uncomment:
+          GCP_PROJECT: ${{ vars.GCP_PROJECT }}     # 👈 ensure your TS sees the project
+          # If you use a service account JSON instead of WIF, uncomment:
           # FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
-          # Optionally force project (helps avoid mismatch):
-          # GCP_PROJECT: your-project-id
-          # If you add google-github-actions/auth later, it'll set GOOGLE_APPLICATION_CREDENTIALS automatically (ADC).
         run: |
           set -e
           SCRIPT="${{ steps.detect.outputs.path }}"
