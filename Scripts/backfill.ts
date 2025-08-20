@@ -2,12 +2,11 @@
 import * as fs from 'fs';
 import * as admin from 'firebase-admin';
 
-function getCredential(): admin.credential.Credential {
-  // 1) If you store the whole service account JSON in a secret (plain JSON or base64)
-  const saEnv =
-    process.env.FIREBASE_SERVICE_ACCOUNT ||
-    process.env.FIREBASE_SERVICE_ACCOUNT_BASE64;
+const saEnv = process.env.FIREBASE_SERVICE_ACCOUNT || process.env.FIREBASE_SERVICE_ACCOUNT_BASE64;
+const gac = process.env.GOOGLE_APPLICATION_CREDENTIALS;
 
+function getCredential(): admin.credential.Credential {
+  // If a service-account JSON is provided via env (raw or base64), use it
   if (saEnv) {
     const jsonStr = saEnv.trim().startsWith('{')
       ? saEnv
@@ -16,13 +15,12 @@ function getCredential(): admin.credential.Credential {
     return admin.credential.cert(keyObj as admin.ServiceAccount);
   }
 
-  // 2) If GOOGLE_APPLICATION_CREDENTIALS points to a key file or WIF token file
-  const gac = process.env.GOOGLE_APPLICATION_CREDENTIALS;
+  // If GAC points to a file (e.g. set by google-github-actions/auth), use ADC
   if (gac && fs.existsSync(gac)) {
     return admin.credential.applicationDefault();
   }
 
-  // 3) Fall back to ADC (e.g., Workload Identity Federation) if set by the environment
+  // Fallback to ADC (WIF or gcloud on runners/dev machines)
   return admin.credential.applicationDefault();
 }
 
@@ -30,7 +28,6 @@ function getProjectId(): string | undefined {
   return (
     process.env.GCP_PROJECT ||
     process.env.GOOGLE_CLOUD_PROJECT ||
-    // If FIREBASE_CONFIG is present (from Firebase Hosting/Functions), try to extract projectId
     process.env.FIREBASE_CONFIG?.match(/"projectId":"([^"]+)"/)?.[1]
   );
 }
