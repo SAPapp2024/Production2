@@ -1,70 +1,84 @@
-// Scripts/backfill.ts
-import * as fs from 'fs';
-import * as admin from 'firebase-admin';
-import { GoogleAuth } from 'google-auth-library';
+name: Backfill
+on:
+  workflow_dispatch:
 
-function getCredential(): admin.credential.Credential {
-  // 1) Service-account JSON via env (raw or base64)
-  const saEnv = process.env.FIREBASE_SERVICE_ACCOUNT || process.env.FIREBASE_SERVICE_ACCOUNT_BASE64;
-  if (saEnv) {
-    const jsonStr = saEnv.trim().startsWith('{') ? saEnv : Buffer.from(saEnv, 'base64').toString('utf8');
-    return admin.credential.cert(JSON.parse(jsonStr) as admin.ServiceAccount);
-  }
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
 
-  // 2) If we're in GitHub + WIF (auth@v2 sets GOOGLE_GHA_CREDS_PATH and GOOGLE_APPLICATION_CREDENTIALS),
-  //    use google-auth-library to mint an OAuth token and hand that to Admin SDK.
-  if (process.env.GOOGLE_GHA_CREDS_PATH || process.env.GOOGLE_APPLICATION_CREDENTIALS) {
-    const scopes = ['https://www.googleapis.com/auth/datastore']; // minimal for Firestore
-    const auth = new GoogleAuth({ scopes });
-    return {
-      getAccessToken: async () => {
-        const client = await auth.getClient();
-        const tok = await client.getAccessToken();
-        const access_token = typeof tok === 'string' ? tok : (tok as any)?.token;
-        if (!access_token) throw new Error('Unable to obtain access token from WIF credentials');
-        return { access_token, expires_in: 3600 };
-      },
-    } as unknown as admin.credential.Credential;
-  }
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: false
 
-  // 3) Local dev fallback (gcloud ADC)
-  return admin.credential.applicationDefault();
-}
+      - name: Clear stale submodule metadata (temporary)
+        run: |
+          rm -rf .git/modules/depot_tools || true
+          git config -f .gitmodules --remove-section submodule.depot_tools || true
+          git config --local --remove-section submodule.depot_tools || true
 
-function getProjectId(): string | undefined {
-  return (
-    process.env.GCP_PROJECT ||
-    process.env.GOOGLE_CLOUD_PROJECT ||
-    process.env.GCLOUD_PROJECT ||
-    process.env.FIREBASE_CONFIG?.match(/"projectId":"([^"]+)"/)?.[1] ||
-    (() => {
-      const p = process.env.GOOGLE_APPLICATION_CREDENTIALS;
-      if (p && fs.existsSync(p)) {
-        try {
-          const obj = JSON.parse(fs.readFileSync(p, 'utf8'));
-          return (obj.project_id || obj.quota_project_id) as string | undefined;
-        } catch {}
-      }
-      return undefined;
-    })()
-  );
-}
+      - name: Auth to Google Cloud (WIF)
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WIF_PROVIDER }}
+          service_account: ${{ secrets.GCP_SA_EMAIL }}
+          project_id: ${{ vars.GCP_PROJECT }}
 
-const projectId = getProjectId();
-console.log('Project:', projectId ?? '(none)');
-console.log('Cred mode:', process.env.FIREBASE_SERVICE_ACCOUNT || process.env.FIREBASE_SERVICE_ACCOUNT_BASE64 ? 'service-account-env'
-  : (process.env.GOOGLE_GHA_CREDS_PATH || process.env.GOOGLE_APPLICATION_CREDENTIALS) ? 'wif-token' : 'adc');
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
 
-admin.initializeApp({ credential: getCredential(), projectId });
+      - name: Install deps (root or Scripts/)
+        shell: bash
+        run: |
+          set -e
+          if [ -f Scripts/package.json ]; then
+            if [ -f Scripts/package-lock.json ]; then
+              npm ci --prefix Scripts
+            else
+              npm install --prefix Scripts --no-audit --no-fund
+            fi
+          elif [ -f package.json ]; then
+            if [ -f package-lock.json ] || [ -f npm-shrinkwrap.json ]; then
+              npm ci
+            else
+              npm install --no-audit --no-fund
+            fi
+          fi
 
-(async () => {
-  try {
-    const cols = await admin.firestore().listCollections();
-    console.log('OK collections:', cols.length);
-    process.exit(0);
-  } catch (e: any) {
-    console.error('ERROR:', e?.message || e);
-    process.exit(1);
-  }
-})();
+      - name: Detect script
+        id: detect
+        run: echo "path=Scripts/backfill.ts" >> "$GITHUB_OUTPUT"
 
+      # ✅ Verify the file exists (case-sensitive path!) and show its first lines
+      - name: Verify backfill.ts path and print header
+        shell: bash
+        run: |
+          set -e
+          echo "PWD: $(pwd)"
+          test -f Scripts/backfill.ts || { echo "MISSING: Scripts/backfill.ts (did you mean 'Scripts' not 'Scrips'?)"; find . -maxdepth 3 -type f -name 'backfill.ts'; exit 1; }
+          sed -n '1,60p' Scripts/backfill.ts
+
+      - name: Run backfill (TS/JS)
+        shell: bash
+        env:
+          NODE_OPTIONS: --enable-source-maps
+          GCP_PROJECT: ${{ vars.GCP_PROJECT }}
+        run: |
+          set -e
+          SCRIPT="${{ steps.detect.outputs.path }}"
+          case "$SCRIPT" in
+            *.ts)
+              if [ -f Scripts/package.json ]; then
+                npx --prefix Scripts ts-node --transpile-only "$SCRIPT"
+              else
+                npx ts-node --transpile-only "$SCRIPT"
+              fi
+              ;;
+            *.js) node "$SCRIPT" ;;
+          esac
